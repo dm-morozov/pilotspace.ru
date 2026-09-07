@@ -26,17 +26,29 @@
             <div class="stats-card">
                 <div class="stat-item">
                     <span class="stat-value" id="total-questions">-</span>
-                    <span class="stat-label">Вопросов доступно</span>
+                    <span class="stat-label">Вопросов с однозначным ответом по PDF</span>
                 </div>
             </div>
+            <p class="audit-notice">Еще <span id="review-count">—</span> вопросов содержат неоднозначности в PDF и доступны отдельно без оценки. <a href="SOURCE_REVIEW.md" target="_blank" rel="noopener">Подробности проверки</a></p>
             
             <div class="settings">
                 <h3>Настройки тестирования</h3>
+                <div class="form-group">
+                    <label for="mode-select">Режим:</label>
+                    <select id="mode-select">
+                        <option value="quiz">Тренировка с оценкой</option>
+                        <option value="review">Спорные вопросы PDF — без оценки</option>
+                    </select>
+                </div>
                 <div class="form-group">
                     <label for="section-select">Выберите раздел (или оставьте все):</label>
                     <select id="section-select">
                         <option value="all">Все разделы</option>
                     </select>
+                </div>
+                <div class="form-group" id="subsection-group">
+                    <label for="subsection-select" id="subsection-label">Подраздел / система:</label>
+                    <select id="subsection-select"><option value="all">Все подразделы</option></select>
                 </div>
                 <div class="form-group">
                     <label for="range-select">Выберите диапазон вопросов:</label>
@@ -60,20 +72,28 @@
                 </div>
                 <div class="quiz-stats">
                     <span id="current-question-num">Вопрос 1 из 20</span>
-                    <span class="score-badge">Счет: <span id="score">0</span></span>
+                    <span class="score-badge" id="score-badge">Счет: <span id="score">0</span></span>
                 </div>
             </div>
             
             <div class="question-container">
                 <div id="question-section" class="section-tag">Раздел</div>
                 <h2 id="question-text">Текст вопроса</h2>
+                <div id="question-source" class="source-links"></div>
+                <div id="question-images"></div>
+                <p id="question-note" class="source-note"></p>
+                <p id="answer-help"></p>
+                <p id="review-details" class="audit-notice" hidden></p>
                 <div id="options-container" class="options">
                     <!-- Options will be injected here -->
                 </div>
+                <p id="answer-feedback" role="status" aria-live="polite"></p>
             </div>
             
             <div class="quiz-footer">
+                <button id="btn-check" class="btn primary" hidden disabled>Проверить ответ</button>
                 <button id="btn-next" class="btn secondary" disabled>Далее</button>
+                <button id="btn-home" class="btn secondary">К настройкам</button>
             </div>
         </div>
 
@@ -92,7 +112,7 @@
         </div>
     </div>
 
-    <script src="questions.js?v=2"></script>
-    <script src="app.js"></script>
+    <script src="questions.js?v=3"></script>
+    <script src="app.js?v=3"></script>
 </body>
 </html>

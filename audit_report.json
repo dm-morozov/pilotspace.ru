@@ -1,0 +1,553 @@
+{
+  "pdf_sha256": "687b82a836b348a4ab1dbd7d90aec93d8b9c1f3ac70da0d23c92649fc75d4402",
+  "pages": 480,
+  "questions": 2854,
+  "answer_keys": 2854,
+  "issues": [],
+  "verified": 2840,
+  "needs_review": [
+    {
+      "uid": "3.4.1:C:14",
+      "section": "3.4.1. Руководство по летной эксплуатации ВС Airbus 330 (AFM/FCOM)",
+      "section_id": "3.4.1",
+      "subsection": "(C) Auto Flight",
+      "id": 14,
+      "question": "What is the function of the ALT pushbutton on the Flight Control Unit (FCU)?",
+      "options": {
+        "A": "Commands an immediate level off during descent",
+        "B": "Commands an immediate level off during climb",
+        "C": "Commands an immediate level off during climb or descent"
+      },
+      "highlighted_answers": [
+        "C"
+      ],
+      "source_option_labels": {
+        "A": "A",
+        "B": "B",
+        "C": "D"
+      },
+      "source_pages": [
+        95
+      ],
+      "source_printed_pages": [
+        "3-73"
+      ],
+      "correct_answers": [],
+      "table_answers": [
+        "C"
+      ],
+      "answer_source_page": 138,
+      "status": "needs_review",
+      "review_reason": "В таблице указан C, но в PDF варианты A, B, D; выделен D.",
+      "source_note": "Буквы вариантов приведены к A, B, C… по порядку; исходные буквы сохранены отдельно."
+    },
+    {
+      "uid": "3.4.1:K:7",
+      "section": "3.4.1. Руководство по летной эксплуатации ВС Airbus 330 (AFM/FCOM)",
+      "section_id": "3.4.1",
+      "subsection": "(K) Ice and Rain Protection",
+      "id": 7,
+      "question": "Which of the following is NOT one of the Windshield Wiper setting on the A330?",
+      "options": {
+        "A": "INTERMITTENT",
+        "B": "FAST",
+        "C": "OFF",
+        "D": "SLOW"
+      },
+      "highlighted_answers": [
+        "C"
+      ],
+      "source_option_labels": {
+        "A": "A",
+        "B": "B",
+        "C": "A",
+        "D": "B"
+      },
+      "source_pages": [
+        113
+      ],
+      "source_printed_pages": [
+        "3-91"
+      ],
+      "correct_answers": [],
+      "table_answers": [
+        "A"
+      ],
+      "answer_source_page": 139,
+      "status": "needs_review",
+      "review_reason": "Выделения PDF и таблица ответов не дают однозначного совпадения.",
+      "source_note": "Буквы вариантов приведены к A, B, C… по порядку; исходные буквы сохранены отдельно."
+    },
+    {
+      "uid": "3.4.2:E:8",
+      "section": "3.4.2. Руководство по летной эксплуатации ВС Airbus 319/320/321 (AFM/FCOM)",
+      "section_id": "3.4.2",
+      "subsection": "(E) Electrical",
+      "id": 8,
+      "question": "Each engine-driven generator supplies its associated directly:",
+      "options": {
+        "A": "AC BUS",
+        "B": "DC BUS",
+        "C": "AC and DC BUSs"
+      },
+      "highlighted_answers": [
+        "B"
+      ],
+      "source_option_labels": {
+        "A": "A",
+        "B": "A",
+        "C": "B"
+      },
+      "source_pages": [
+        157
+      ],
+      "source_printed_pages": [
+        "3-135"
+      ],
+      "correct_answers": [],
+      "table_answers": [
+        "A"
+      ],
+      "answer_source_page": 221,
+      "status": "needs_review",
+      "review_reason": "Выделения PDF и таблица ответов не дают однозначного совпадения.",
+      "source_note": "Буквы вариантов приведены к A, B, C… по порядку; исходные буквы сохранены отдельно."
+    },
+    {
+      "uid": "3.4.2:I:9",
+      "section": "3.4.2. Руководство по летной эксплуатации ВС Airbus 319/320/321 (AFM/FCOM)",
+      "section_id": "3.4.2",
+      "subsection": "(I) Fuel",
+      "id": 9,
+      "question": "The Fuel Used indication on ECAM is reset:",
+      "options": {
+        "A": "Manually by the pilot",
+        "B": "Automatically at engine start on the ground",
+        "C": "Automatically at electric power up of the aircraft"
+      },
+      "highlighted_answers": [
+        "A"
+      ],
+      "source_option_labels": {
+        "A": null,
+        "B": null,
+        "C": null
+      },
+      "source_pages": [
+        172
+      ],
+      "source_printed_pages": [
+        "3-150"
+      ],
+      "source_note": "В PDF отсутствуют буквы вариантов; они восстановлены по порядку строк.",
+      "correct_answers": [],
+      "table_answers": [
+        "B"
+      ],
+      "answer_source_page": 222,
+      "status": "needs_review",
+      "review_reason": "Выделения PDF и таблица ответов не дают однозначного совпадения."
+    },
+    {
+      "uid": "3.4.2:I:16",
+      "section": "3.4.2. Руководство по летной эксплуатации ВС Airbus 319/320/321 (AFM/FCOM)",
+      "section_id": "3.4.2",
+      "subsection": "(I) Fuel",
+      "id": 16,
+      "question": "The green message OUTER TK FUEL XFRD appears on the ECAM MEMO display. What does it mean?",
+      "options": {
+        "A": "It is a reminder to show that a transfer valve is open",
+        "B": "Fuel is transferring from the center tank to the inner tank",
+        "C": "Fuel is transferring from the outer tank to the inner tank"
+      },
+      "highlighted_answers": [
+        "B",
+        "C"
+      ],
+      "source_option_labels": {
+        "A": "A",
+        "B": "B",
+        "C": "C"
+      },
+      "source_pages": [
+        173
+      ],
+      "source_printed_pages": [
+        "3-151"
+      ],
+      "correct_answers": [],
+      "table_answers": [
+        "C"
+      ],
+      "answer_source_page": 222,
+      "status": "needs_review",
+      "review_reason": "Выделения PDF и таблица ответов не дают однозначного совпадения."
+    },
+    {
+      "uid": "3.4.2:L:17",
+      "section": "3.4.2. Руководство по летной эксплуатации ВС Airbus 319/320/321 (AFM/FCOM)",
+      "section_id": "3.4.2",
+      "subsection": "(L) Indicating/Recording Systems",
+      "id": 17,
+      "question": "After a normal engine shutdown, you observe a pulsing STS message. What does it mean?",
+      "options": {
+        "A": "It is an indication that at least one system requires crew attention",
+        "B": "It is an indication that the aircraft has not been shut down correctly",
+        "C": "It is a reminder that the status page holds a maintenance message"
+      },
+      "highlighted_answers": [
+        "B",
+        "C"
+      ],
+      "source_option_labels": {
+        "A": "A",
+        "B": "B",
+        "C": "C"
+      },
+      "source_pages": [
+        183
+      ],
+      "source_printed_pages": [
+        "3-161"
+      ],
+      "correct_answers": [],
+      "table_answers": [
+        "C"
+      ],
+      "answer_source_page": 222,
+      "status": "needs_review",
+      "review_reason": "Выделения PDF и таблица ответов не дают однозначного совпадения."
+    },
+    {
+      "uid": "3.4.2:O:30",
+      "section": "3.4.2. Руководство по летной эксплуатации ВС Airbus 319/320/321 (AFM/FCOM)",
+      "section_id": "3.4.2",
+      "subsection": "(O) Navigation and Surveillance",
+      "id": 30,
+      "question": "The ATSAW detection capability is limited to aircraft flying within a maximum altitude range of:",
+      "options": {
+        "A": "3000 ft (above and below the aircraft)",
+        "B": "2 700 ft (above and below the aircraft)",
+        "C": "9 900 ft (above and below the aircraft)"
+      },
+      "highlighted_answers": [
+        "B",
+        "C"
+      ],
+      "source_option_labels": {
+        "A": "A",
+        "B": "B",
+        "C": "C"
+      },
+      "source_pages": [
+        200
+      ],
+      "source_printed_pages": [
+        "3-178"
+      ],
+      "correct_answers": [],
+      "table_answers": [
+        "C"
+      ],
+      "answer_source_page": 223,
+      "status": "needs_review",
+      "review_reason": "Выделения PDF и таблица ответов не дают однозначного совпадения."
+    },
+    {
+      "uid": "3.4.2:Q:3",
+      "section": "3.4.2. Руководство по летной эксплуатации ВС Airbus 319/320/321 (AFM/FCOM)",
+      "section_id": "3.4.2",
+      "subsection": "(Q) Pneumatic",
+      "id": 3,
+      "question": "The air is bled from:",
+      "options": {
+        "A": "Both HP and IP stages simultaneously during all phases of flight",
+        "B": "IP stage during climb and descent and both stages during cruise",
+        "C": "IP or HP stage. It is automatically controlled by the system"
+      },
+      "highlighted_answers": [
+        "B",
+        "C"
+      ],
+      "source_option_labels": {
+        "A": "A",
+        "B": "B",
+        "C": "C"
+      },
+      "source_pages": [
+        205
+      ],
+      "source_printed_pages": [
+        "3-183"
+      ],
+      "correct_answers": [],
+      "table_answers": [
+        "C"
+      ],
+      "answer_source_page": 223,
+      "status": "needs_review",
+      "review_reason": "Выделения PDF и таблица ответов не дают однозначного совпадения."
+    },
+    {
+      "uid": "3.4.2:T:1",
+      "section": "3.4.2. Руководство по летной эксплуатации ВС Airbus 319/320/321 (AFM/FCOM)",
+      "section_id": "3.4.2",
+      "subsection": "(T) Doors",
+      "id": 1,
+      "question": "The cockpit sliding window is closed and locked. How can you check it?",
+      "options": {
+        "A": "The pin is engaged",
+        "B": "The locking pin was placed in the forward position when the window was closed",
+        "C": "The red ring below the release button should be in view"
+      },
+      "highlighted_answers": [
+        "B",
+        "C"
+      ],
+      "source_option_labels": {
+        "A": "A",
+        "B": "B",
+        "C": "C"
+      },
+      "source_pages": [
+        212
+      ],
+      "source_printed_pages": [
+        "3-190"
+      ],
+      "correct_answers": [],
+      "table_answers": [
+        "C"
+      ],
+      "answer_source_page": 223,
+      "status": "needs_review",
+      "review_reason": "Выделения PDF и таблица ответов не дают однозначного совпадения.",
+      "images": [
+        {
+          "src": "images/page-212-1.png",
+          "page": 212,
+          "bbox": [
+            70.9000015258789,
+            198.50997924804688,
+            430.3999938964844,
+            377.0099792480469
+          ],
+          "alt": "Иллюстрация из PDF, страница 212, вопрос 1"
+        }
+      ]
+    },
+    {
+      "uid": "3.4.2:U:22",
+      "section": "3.4.2. Руководство по летной эксплуатации ВС Airbus 319/320/321 (AFM/FCOM)",
+      "section_id": "3.4.2",
+      "subsection": "(U) Engines",
+      "id": 22,
+      "question": "Can the flight crew activate engine reversers in flight?",
+      "options": {
+        "A": "Yes, IDLE reverse power available only",
+        "B": "No, there is a protection deactivating thrust reversers when Radio Altitude is 20ft or above",
+        "C": "No, both main gears must be compressed in order to activate thrust reversers"
+      },
+      "highlighted_answers": [
+        "B",
+        "C"
+      ],
+      "source_option_labels": {
+        "A": "A",
+        "B": "B",
+        "C": "C"
+      },
+      "source_pages": [
+        218
+      ],
+      "source_printed_pages": [
+        "3-196"
+      ],
+      "correct_answers": [],
+      "table_answers": [
+        "C"
+      ],
+      "answer_source_page": 223,
+      "status": "needs_review",
+      "review_reason": "Выделения PDF и таблица ответов не дают однозначного совпадения."
+    },
+    {
+      "uid": "3.4.2:U:23",
+      "section": "3.4.2. Руководство по летной эксплуатации ВС Airbus 319/320/321 (AFM/FCOM)",
+      "section_id": "3.4.2",
+      "subsection": "(U) Engines",
+      "id": 23,
+      "question": "During the automatic start sequence of ENG 2, you notice that only igniter B is powered. Is it normal?",
+      "options": {
+        "A": "No, normally both igniters are used for engine start",
+        "B": "Yes, igniter B is always used for ENG 2 start, igniter A is used for ENG 1 start",
+        "C": "Yes, igniters are used alternately for engine start"
+      },
+      "highlighted_answers": [
+        "B",
+        "C"
+      ],
+      "source_option_labels": {
+        "A": "A",
+        "B": "B",
+        "C": "C"
+      },
+      "source_pages": [
+        218
+      ],
+      "source_printed_pages": [
+        "3-196"
+      ],
+      "correct_answers": [],
+      "table_answers": [
+        "C"
+      ],
+      "answer_source_page": 223,
+      "status": "needs_review",
+      "review_reason": "Выделения PDF и таблица ответов не дают однозначного совпадения."
+    },
+    {
+      "uid": "3.4.4:B:13",
+      "section": "3.4.4. Руководство по летной эксплуатации ВС Boeing 767 (AFM/FCOM)",
+      "section_id": "3.4.4",
+      "subsection": "(B) Air conditioning/Pressurization/Ventilation",
+      "id": 13,
+      "question": "The cargo heat overheat condition and associated indications:",
+      "options": {
+        "A": "will automatically reset",
+        "B": "must be reset by the crew",
+        "C": "cannot be reset"
+      },
+      "highlighted_answers": [
+        "C"
+      ],
+      "source_option_labels": {
+        "A": "A",
+        "B": "B",
+        "C": "A"
+      },
+      "source_pages": [
+        288
+      ],
+      "source_printed_pages": [
+        "3-266"
+      ],
+      "correct_answers": [],
+      "table_answers": [
+        "A"
+      ],
+      "answer_source_page": 341,
+      "status": "needs_review",
+      "review_reason": "Выделения PDF и таблица ответов не дают однозначного совпадения.",
+      "source_note": "Буквы вариантов приведены к A, B, C… по порядку; исходные буквы сохранены отдельно."
+    },
+    {
+      "uid": "3.4.4:G:3",
+      "section": "3.4.4. Руководство по летной эксплуатации ВС Boeing 767 (AFM/FCOM)",
+      "section_id": "3.4.4",
+      "subsection": "(G) Flight Controls",
+      "id": 3,
+      "question": "The PES makes stabilizer trim available ___ of the normal trim rate and can only be operated by use of the electric trim switches.",
+      "options": {
+        "A": "1/4",
+        "B": "full",
+        "C": "1/2"
+      },
+      "highlighted_answers": [
+        "C"
+      ],
+      "source_option_labels": {
+        "A": "A",
+        "B": "B",
+        "C": "A"
+      },
+      "source_pages": [
+        308
+      ],
+      "source_printed_pages": [
+        "3-286"
+      ],
+      "correct_answers": [],
+      "table_answers": [
+        "A"
+      ],
+      "answer_source_page": 342,
+      "status": "needs_review",
+      "review_reason": "Выделения PDF и таблица ответов не дают однозначного совпадения.",
+      "source_note": "Буквы вариантов приведены к A, B, C… по порядку; исходные буквы сохранены отдельно."
+    },
+    {
+      "uid": "3.5.1:22",
+      "section": "3.5.1. Практическая аэродинамика",
+      "section_id": "3.5.1",
+      "subsection": null,
+      "id": 22,
+      "question": "Условия равновесия сил установившегося прямолинейного набора высоты:",
+      "options": {
+        "A": "Y = G • cos , X = P + G • sin .",
+        "B": "Y = G • cos , P = X + G • sin .",
+        "C": "G = Y, X = P."
+      },
+      "highlighted_answers": [
+        "A"
+      ],
+      "source_option_labels": {
+        "A": "A",
+        "B": "B",
+        "C": "C"
+      },
+      "source_pages": [
+        346
+      ],
+      "source_printed_pages": [
+        "3-324"
+      ],
+      "correct_answers": [],
+      "table_answers": [
+        "A"
+      ],
+      "answer_source_page": 355,
+      "status": "needs_review",
+      "review_reason": "В исходном PDF символы после cos и sin отображаются пустыми квадратами. Полную запись формул восстановить однозначно нельзя.",
+      "images": [
+        {
+          "src": "images/page-346-1.png",
+          "page": 346,
+          "bbox": [
+            141.74000549316406,
+            625.2999877929688,
+            160.4600067138672,
+            638.6199951171875
+          ],
+          "alt": "Фрагмент вопроса с графическими символами, страница PDF 346",
+          "excerpt": true
+        }
+      ]
+    }
+  ],
+  "images": 60,
+  "sections": {
+    "3.1": 37,
+    "3.2": 242,
+    "3.3": 99,
+    "3.4.1": 264,
+    "3.4.2": 467,
+    "3.4.3": 455,
+    "3.4.4": 456,
+    "3.5.1": 86,
+    "3.5.2": 32,
+    "3.5.3": 33,
+    "3.5.4": 75,
+    "3.6.1": 54,
+    "3.6.2": 54,
+    "3.6.3": 44,
+    "3.7": 156,
+    "3.8": 59,
+    "3.9.1": 28,
+    "3.9.2": 32,
+    "3.9.3": 33,
+    "3.10": 39,
+    "3.11": 37,
+    "3.12": 72
+  }
+}

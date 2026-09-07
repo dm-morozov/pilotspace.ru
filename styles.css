@@ -12,6 +12,19 @@
     --option-hover: #475569;
 }
 
+[hidden] { display: none !important; }
+a { color: #a5b4fc; }
+.audit-notice { margin: 0 0 24px; line-height: 1.6; color: #fde68a; }
+.source-links, .source-note { font-size: 0.85rem; line-height: 1.5; margin-bottom: 16px; color: var(--text-muted); }
+#question-images img { display: block; max-width: 100%; height: auto; margin: 16px auto; background: white; border-radius: 4px; }
+#answer-help, #answer-feedback { margin: 16px 0; line-height: 1.5; }
+.quiz-footer { display: flex; flex-wrap: wrap; gap: 12px; }
+.quiz-footer .btn { flex: 1 1 180px; }
+.option { text-align: left; color: var(--text-main); width: 100%; }
+.option.selected { border-color: #a5b4fc; }
+.option:disabled { opacity: 1; cursor: default; }
+.option:focus-visible, .btn:focus-visible { outline: 3px solid #a5b4fc; outline-offset: 3px; }
+
 * {
     margin: 0;
     padding: 0;
