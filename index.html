@@ -2,15 +2,27 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#f4f6fa">
     <title>Тренажер ЧЛЭ - Вопросы и Ответы</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <script src="theme.js?v=1"></script>
+    <link rel="stylesheet" href="styles.css?v=8">
 </head>
 <body>
     <div id="app">
+        <header class="app-header">
+            <div class="brand" aria-label="ЧЛЭ. Тренажёр для пилотов">
+                <span class="brand-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m21 3-7 18-3-8-8-3L21 3Z M11 13 21 3"/></svg></span>
+                <span class="brand-name">ЧЛЭ<span>Тренажёр для пилотов</span></span>
+            </div>
+            <div class="theme-switch" role="group" aria-label="Цветовая тема">
+                <button type="button" data-theme-choice="light" aria-label="Светлая тема" title="Светлая тема" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg></button>
+                <button type="button" data-theme-choice="system" aria-label="Тема устройства" title="Как на устройстве" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8m-4-4v4"/></svg></button>
+                <button type="button" data-theme-choice="dark" aria-label="Тёмная тема" title="Тёмная тема" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14A9 9 0 0 1 10 3a9 9 0 1 0 10.5 11Z"/></svg></button>
+            </div>
+        </header>
+        <main id="main-content">
+        <p id="storage-notice" class="storage-notice" role="status"></p>
         <!-- Loading Screen -->
         <div id="loading-screen" class="screen active">
             <div class="loader"></div>
@@ -19,54 +31,84 @@
 
         <!-- Start Screen -->
         <div id="start-screen" class="screen">
-            <header>
-                <h1>Тренажер для ЧЛЭ</h1>
-                <p>База тестовых вопросов и ответов из PDF</p>
-            </header>
-            <div class="stats-card">
-                <div class="stat-item">
-                    <span class="stat-value" id="total-questions">-</span>
-                    <span class="stat-label">Вопросов с однозначным ответом по PDF</span>
+            <div class="intro">
+                <span class="eyebrow"><span class="status-dot"></span> В своём темпе. В любом месте.</span>
+                <h1>К следующему <br>полёту&nbsp;—<br><span>с уверенностью.</span></h1>
+                <p class="intro-description">Повторяйте теорию, проверяйте знания и готовьтесь к тестированию. По одному вопросу за раз.</p>
+                <div class="intro-stats">
+                    <div><strong id="total-questions">—</strong><span>вопросов для практики</span></div>
+                    <div><strong>Без оплаты</strong><span>и регистрации</span></div>
                 </div>
+                <div class="route-art" aria-hidden="true">
+                    <svg viewBox="0 0 380 100" fill="none"><path d="M14 79H365M14 49H365M14 19H365M45 5v90m60-90v90m60-90v90m60-90v90m60-90v90m60-90v90" class="route-grid"/><path d="M28 76C113 77 122 28 189 30s105 30 158-13" class="route-path"/><circle cx="28" cy="76" r="4"/><path d="m343 9 13 2-5 13-2-9-6-6Z"/></svg>
+                    <span>Знания — ваш надёжный ориентир</span>
+                </div>
+                <details class="audit-details">
+                    <summary>О базе вопросов <span class="count-chip" id="review-count">—</span></summary>
+                    <p>Некоторые вопросы в исходном PDF неоднозначны. Они доступны в отдельном режиме без оценки. <a href="SOURCE_REVIEW.md" target="_blank" rel="noopener">Открыть отчёт проверки</a></p>
+                </details>
             </div>
-            <p class="audit-notice">Еще <span id="review-count">—</span> вопросов содержат неоднозначности в PDF и доступны отдельно без оценки. <a href="SOURCE_REVIEW.md" target="_blank" rel="noopener">Подробности проверки</a></p>
             
             <div class="settings">
-                <h3>Настройки тестирования</h3>
+                <section id="resume-panel" class="progress-panel" aria-labelledby="resume-title" hidden>
+                    <h2 id="resume-title">Продолжим с того же места?</h2>
+                    <p id="resume-description"></p>
+                    <button id="btn-resume" class="btn primary" type="button">Продолжить тренировку</button>
+                </section>
+                <section class="progress-panel" aria-labelledby="mistakes-title">
+                    <h2 id="mistakes-title">Работа над ошибками <span id="mistake-count" class="count-chip">0</span></h2>
+                    <p>Здесь остаются вопросы, на которые вы ответили неверно. Правильный ответ при повторении уберёт вопрос из списка.</p>
+                    <p id="mistake-empty">Пока ошибок нет.</p>
+                    <details class="mistake-details"><summary>Посмотреть список вопросов</summary><ul id="mistake-list"></ul></details>
+                    <button id="btn-mistakes" class="btn secondary" type="button" disabled>Повторить ошибки</button>
+                </section>
+                <div class="settings-heading"><span class="eyebrow">Новая тренировка</span><h2>Что повторим сегодня?</h2><p>Выберите тему и удобный объём вопросов.</p></div>
                 <div class="form-group">
-                    <label for="mode-select">Режим:</label>
+                    <label for="mode-select">Режим</label>
                     <select id="mode-select">
                         <option value="quiz">Тренировка с оценкой</option>
                         <option value="review">Спорные вопросы PDF — без оценки</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="section-select">Выберите раздел (или оставьте все):</label>
+                    <label for="section-select">Раздел подготовки</label>
                     <select id="section-select">
                         <option value="all">Все разделы</option>
                     </select>
+                    <p id="selected-section-caption" class="selection-caption"></p>
                 </div>
                 <div class="form-group" id="subsection-group">
-                    <label for="subsection-select" id="subsection-label">Подраздел / система:</label>
+                    <label for="subsection-select" id="subsection-label">Система самолёта</label>
                     <select id="subsection-select"><option value="all">Все подразделы</option></select>
                 </div>
-                <div class="form-group">
-                    <label for="range-select">Выберите диапазон вопросов:</label>
+                <div id="practice-size-group" class="form-group">
+                    <span id="practice-size-label" class="field-label">Сколько вопросов пройдём?</span>
+                    <div class="practice-sizes" role="group" aria-labelledby="practice-size-label" aria-describedby="practice-summary">
+                        <button id="size-10" type="button" aria-pressed="false"><strong>10</strong><span>Разминка</span></button>
+                        <button id="size-20" type="button" aria-pressed="true"><strong>20</strong><span>Практика</span></button>
+                        <button id="size-50" type="button" aria-pressed="false"><strong>50</strong><span>Погружение</span></button>
+                        <button id="size-custom" type="button" aria-pressed="false"><strong>Свой</strong><span>Диапазон</span></button>
+                    </div>
+                </div>
+                <p id="practice-summary" class="practice-summary" role="status"></p>
+                <div class="form-group" id="range-group" hidden>
+                    <label for="range-select">Диапазон вопросов</label>
                     <select id="range-select">
                         <!-- Динамически заполняется -->
                     </select>
                 </div>
-                <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
-                    <input type="checkbox" id="random-checkbox" style="width: auto;" checked>
-                    <label for="random-checkbox" style="margin: 0; cursor: pointer;">Перемешать вопросы</label>
-                </div>
+                <label id="shuffle-group" class="shuffle-setting" for="random-checkbox" hidden><span><strong>Случайный порядок</strong><small>Чтобы проверять знания, а не память о порядке</small></span><input type="checkbox" id="random-checkbox" checked></label>
                 <button id="btn-start" class="btn primary">Начать тест</button>
+                <p id="replace-notice" class="settings-footnote" hidden>Начало новой тренировки или повторения ошибок заменит незавершённую тренировку. Список ошибок сохранится.</p>
+                <p class="settings-footnote">Без таймера. Можно спокойно обдумать ответ.</p>
+                <p class="settings-footnote">Прогресс сохраняется автоматически в этом браузере. При очистке данных сайта он удалится. Между устройствами не переносится.</p>
             </div>
         </div>
 
         <!-- Quiz Screen -->
         <div id="quiz-screen" class="screen">
             <div class="quiz-header">
+                <div class="quiz-topline"><button id="btn-home" class="text-button" type="button">← К настройкам</button><span class="eyebrow">Практика</span></div>
                 <div class="progress-bar">
                     <div class="progress-fill" id="progress-bar-fill"></div>
                 </div>
@@ -78,10 +120,9 @@
             
             <div class="question-container">
                 <div id="question-section" class="section-tag">Раздел</div>
-                <h2 id="question-text">Текст вопроса</h2>
-                <div id="question-source" class="source-links"></div>
+                <h2 id="question-text" tabindex="-1">Текст вопроса</h2>
+                <details id="source-details" class="source-details"><summary>Источник и примечания</summary><div id="question-source" class="source-links"></div><p id="question-note" class="source-note"></p></details>
                 <div id="question-images"></div>
-                <p id="question-note" class="source-note"></p>
                 <p id="answer-help"></p>
                 <p id="review-details" class="audit-notice" hidden></p>
                 <div id="options-container" class="options">
@@ -92,27 +133,72 @@
             
             <div class="quiz-footer">
                 <button id="btn-check" class="btn primary" hidden disabled>Проверить ответ</button>
-                <button id="btn-next" class="btn secondary" disabled>Далее</button>
-                <button id="btn-home" class="btn secondary">К настройкам</button>
+                <button id="btn-next" class="btn primary" disabled>Далее</button>
             </div>
         </div>
 
         <!-- Result Screen -->
         <div id="result-screen" class="screen">
             <div class="result-card">
-                <h2>Тест завершен!</h2>
+                <div class="result-icon" aria-hidden="true">✓</div>
+                <span class="eyebrow">Ещё один шаг вперёд</span>
+                <h2>Тренировка завершена</h2>
                 <div class="final-score">
                     <span id="final-score-value">0</span> / <span id="final-score-total">0</span>
                 </div>
+                <p class="result-caption">правильных ответов</p>
                 <p id="result-message" class="result-message">Отличный результат!</p>
                 <div class="action-buttons">
+                    <p id="result-mistakes-count" class="settings-footnote"></p>
+                    <button id="btn-result-mistakes" class="btn secondary" type="button" hidden>Повторить ошибки</button>
                     <button id="btn-restart" class="btn primary">Начать заново</button>
                 </div>
             </div>
         </div>
+        </main>
+        <section id="support-section" class="support-card" aria-labelledby="support-title" hidden>
+            <div class="support-heading">
+                <span class="support-icon" aria-hidden="true">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 8h12v7a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8Z"/>
+                        <path d="M16 9h2a3 3 0 0 1 0 6h-2M7 3v2m4-2v2M3 22h15"/>
+                    </svg>
+                </span>
+                <div>
+                    <span class="support-eyebrow">Ваша поддержка помогает</span>
+                    <h2 id="support-title">Угостить автора кофе</h2>
+                </div>
+            </div>
+            <p>Если тренажёр оказался вам полезен, вы можете поддержать проект любой суммой. Для вас это может быть чашка кофе, а для меня — большой вклад в развитие приложения.</p>
+            <p>В комментарии к переводу можно написать, чего вам не хватает в тренажёре. Я постараюсь постепенно воплощать ваши пожелания, чтобы учиться было ещё удобнее.</p>
+            <div class="support-payment">
+                <div class="support-requisites">
+                    <label for="support-card-number">Перевод на карту · любая сумма</label>
+                    <input id="support-card-number" type="text" value="2200 3961 1392 6436" readonly spellcheck="false" aria-describedby="support-copy-status">
+                </div>
+                <button id="btn-copy-card" class="btn secondary" type="button">Скопировать номер</button>
+            </div>
+            <p id="support-copy-status" class="support-copy-status" role="status" aria-live="polite"></p>
+            <p class="support-footer">Поддержка полностью добровольная. Тренажёр остаётся бесплатным для всех. Спасибо, что пользуетесь проектом!</p>
+        </section>
     </div>
 
     <script src="questions.js?v=3"></script>
-    <script src="app.js?v=3"></script>
+    <footer class="app-footer">
+        <div class="footer-contact">
+            <div class="footer-author">
+                <span class="eyebrow">На связи с вами</span>
+                <h2>Дмитрий Морозов</h2>
+                <p>Нашли ошибку, придумали улучшение или хотите сказать спасибо? Напишите мне — буду рад вашим идеям и добрым словам.</p>
+            </div>
+            <div class="footer-links" aria-label="Связаться с автором">
+                <a href="mailto:dem.morozov@gmail.com"><span>Почта</span>dem.morozov@gmail.com</a>
+                <a href="https://t.me/dem2014" target="_blank" rel="noopener noreferrer"><span>Telegram ↗</span>@dem2014</a>
+            </div>
+        </div>
+        <div class="footer-bottom"><span>ЧЛЭ · Учиться с комфортом</span><span>Бесплатно. Для тех, кто в небе.</span></div>
+    </footer>
+    <script src="app.js?v=7"></script>
+    <script src="support.js?v=1"></script>
 </body>
 </html>

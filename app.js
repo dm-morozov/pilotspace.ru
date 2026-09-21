@@ -9,10 +9,89 @@ document.addEventListener('DOMContentLoaded', () => {
     answered = false,
     selected = new Set()
   const reviewMode = () => $('mode-select').value === 'review'
-  const switchScreen = (name) =>
+  let practiceSize = '20'
+  const shortPractice = () => !reviewMode() && practiceSize !== 'custom'
+
+  function updatePracticeSize() {
+    const total = filteredQuestions().length
+    $('practice-size-group').hidden = reviewMode()
+    $('range-group').hidden = shortPractice()
+    $('shuffle-group').hidden = shortPractice()
+    for (const size of ['10', '20', '50', 'custom']) {
+      $(`size-${size}`).setAttribute('aria-pressed', String(practiceSize === size))
+    }
+    let count = total
+    if (shortPractice()) count = Math.min(Number(practiceSize), total)
+    else if ($('range-select').value !== 'all') {
+      const [start, end] = $('range-select').value.split('-').map(Number)
+      count = end - start
+    }
+    $('practice-summary').textContent = total === 0
+      ? 'В этой теме нет доступных вопросов. Выберите другой раздел.'
+      : shortPractice()
+        ? `${count} из ${total} вопросов выбранной темы — случайная подборка без повторов.${total < Number(practiceSize) ? ' В теме меньше вопросов, поэтому включим все.' : ''}`
+        : `${count} вопросов выбранной темы. ${reviewMode() ? 'Просмотр без оценки.' : 'Порядок можно изменить переключателем ниже.'}`
+    $('btn-start').disabled = total === 0
+    $('btn-start').textContent = reviewMode() ? 'Посмотреть спорные вопросы' : `Начать · ${count} вопр.`
+  }
+  const storageKey = 'chle-progress-v1'
+  const byId = new Map(allQuestions.map(q => [q.uid, q]))
+  let saved = null, mistakes = new Set(), results = []
+  // A changed question bank must never silently reuse old answers or scores.
+  let revision = 2166136261
+  for (const char of JSON.stringify(allQuestions)) {
+    revision = Math.imul(revision ^ char.charCodeAt(0), 16777619) >>> 0
+  }
+  function persist() {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify({ version: 1, revision, saved, mistakes: [...mistakes] }))
+    } catch {
+      $('storage-notice').textContent = 'Браузер не разрешил сохранение. Можно продолжать тренировку, но после закрытия страницы прогресс может потеряться.'
+    }
+  }
+  function validSession(s) {
+    if (!s || !['quiz', 'review'].includes(s.mode) || !Array.isArray(s.ids) || !s.ids.length ||
+        new Set(s.ids).size !== s.ids.length || !s.ids.every(id => byId.has(id) && byId.get(id).status === (s.mode === 'review' ? 'needs_review' : 'verified')) ||
+        !Number.isInteger(s.index) || s.index < 0 || s.index >= s.ids.length ||
+        !Array.isArray(s.results) || s.results.length !== s.ids.length ||
+        !s.results.every((r, i) => (r === null || typeof r === 'boolean') && (i > s.index ? r === null : true)) ||
+        !Array.isArray(s.selected) || new Set(s.selected).size !== s.selected.length ||
+        !s.selected.every(letter => Object.hasOwn(byId.get(s.ids[s.index]).options, letter))) return false
+    if (s.mode === 'review') return s.results.every(r => r === null) && s.selected.length === 0
+    const q = byId.get(s.ids[s.index])
+    if (s.results.slice(0, s.index).some(r => r === null)) return false
+    if (s.results[s.index] === null) return q.correct_answers.length > 1 || s.selected.length === 0
+    const correct = s.selected.length === q.correct_answers.length && q.correct_answers.every(l => s.selected.includes(l))
+    return s.selected.length > 0 && s.results[s.index] === correct
+  }
+  function saveSession() {
+    saved = { ids: questions.map(q => q.uid), index, results: [...results], selected: [...selected], mode: reviewMode() ? 'review' : 'quiz' }
+    persist()
+  }
+  function refreshProgress() {
+    $('resume-panel').hidden = !saved
+    $('resume-description').textContent = saved ? `${saved.mode === 'review' ? 'Просмотр PDF' : 'Тренировка'} · вопрос ${saved.index + 1} из ${saved.ids.length} · отвечено: ${saved.results.filter(r => r !== null).length}` : ''
+    $('replace-notice').hidden = !saved
+    $('mistake-count').textContent = mistakes.size
+    $('btn-mistakes').disabled = mistakes.size === 0
+    $('mistake-list').replaceChildren()
+    for (const id of mistakes) {
+      const q = byId.get(id), item = document.createElement('li')
+      const title = document.createElement('strong'), section = document.createElement('span')
+      title.textContent = `${q.id}. ${q.question}`
+      section.textContent = [q.section, q.subsection].filter(Boolean).join(' · ')
+      item.append(title, section)
+      $('mistake-list').append(item)
+    }
+    $('mistake-empty').hidden = mistakes.size > 0
+  }
+  const switchScreen = (name) => {
     screens.forEach((s) =>
       $(`${s}-screen`).classList.toggle('active', s === name),
     )
+    $('support-section').hidden = !['start', 'result'].includes(name)
+    if (name === 'start') refreshProgress()
+  }
 
   if (
     !allQuestions.length ||
@@ -28,6 +107,19 @@ document.addEventListener('DOMContentLoaded', () => {
   $('review-count').textContent = allQuestions.filter(
     (q) => q.status === 'needs_review',
   ).length
+  try {
+    const raw = localStorage.getItem(storageKey)
+    if (raw) {
+      const state = JSON.parse(raw)
+      if (state.version === 1 && state.revision === revision) {
+        mistakes = new Set(Array.isArray(state.mistakes) ? state.mistakes.filter(id => byId.get(id)?.status === 'verified') : [])
+        if (validSession(state.saved)) saved = state.saved
+        else if (state.saved) $('storage-notice').textContent = 'Сохранённая тренировка повреждена. Начните новую; список ошибок сохранён.'
+      } else $('storage-notice').textContent = 'База вопросов обновилась. Старый прогресс сброшен, чтобы ответы соответствовали новой базе.'
+    }
+  } catch {
+    $('storage-notice').textContent = 'Не удалось прочитать сохранение. Новую тренировку можно начать как обычно.'
+  }
   for (const section of new Set(allQuestions.map((q) => q.section))) {
     $('section-select').add(new Option(section, section))
   }
@@ -54,14 +146,12 @@ document.addEventListener('DOMContentLoaded', () => {
         new Option(`Вопросы ${start + 1}–${end}`, `${start}-${end}`),
       )
     }
-    $('btn-start').disabled = total === 0
-    $('btn-start').textContent = reviewMode()
-      ? 'Посмотреть спорные вопросы'
-      : 'Начать тест'
+    updatePracticeSize()
   }
 
   function updateSubsections() {
     const section = $('section-select').value
+    $('selected-section-caption').textContent = section === 'all' ? '' : section
     const matching = allQuestions.filter(
       (q) =>
         (section === 'all' || q.section === section) &&
@@ -79,25 +169,55 @@ document.addEventListener('DOMContentLoaded', () => {
     updateRanges()
   }
 
-  function startQuiz() {
-    questions = filteredQuestions()
+  function startQuiz(onlyMistakes = false) {
+    if (onlyMistakes) $('mode-select').value = 'quiz'
+    questions = onlyMistakes ? [...mistakes].map(id => byId.get(id)) : filteredQuestions()
     const range = $('range-select').value
-    if (range !== 'all') {
+    if (!onlyMistakes && !shortPractice() && range !== 'all') {
       const [start, end] = range.split('-').map(Number)
       questions = questions.slice(start, end)
     }
     if (!questions.length) return
-    if ($('random-checkbox').checked) {
+    if ((!onlyMistakes && shortPractice()) || $('random-checkbox').checked) {
       for (let i = questions.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1))
         ;[questions[i], questions[j]] = [questions[j], questions[i]]
       }
     }
+    if (!onlyMistakes && shortPractice()) questions = questions.slice(0, Number(practiceSize))
     index = score = 0
+    results = questions.map(() => null)
     $('score').textContent = '0'
     $('score-badge').hidden = reviewMode()
     switchScreen('quiz')
     loadQuestion()
+    saveSession()
+  }
+
+  function resumeQuiz() {
+    if (!saved) return
+    const session = saved
+    questions = session.ids.map(id => byId.get(id))
+    index = session.index
+    results = [...session.results]
+    score = results.filter(r => r === true).length
+    $('mode-select').value = session.mode
+    updateSubsections()
+    $('score').textContent = score
+    $('score-badge').hidden = reviewMode()
+    switchScreen('quiz')
+    loadQuestion()
+    selected = new Set(session.selected)
+    if (results[index] !== null) {
+      answered = true
+      renderAnswer(results[index])
+    } else {
+      for (const button of $('options-container').children) {
+        button.classList.toggle('selected', selected.has(button.dataset.letter))
+        button.setAttribute('aria-pressed', String(selected.has(button.dataset.letter)))
+      }
+      $('btn-check').disabled = selected.size === 0
+    }
   }
 
   function sourceLink(label, page) {
@@ -115,6 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const q = questions[index]
     answered = false
     selected = new Set()
+    $('source-details').open = false
     $('current-question-num').textContent =
       `Вопрос ${index + 1} из ${questions.length}`
     $('progress-bar-fill').style.width = `${(index / questions.length) * 100}%`
@@ -179,6 +300,8 @@ document.addEventListener('DOMContentLoaded', () => {
           ? 'Закрыть просмотр'
           : 'Завершить'
         : 'Далее'
+    $('question-text').focus?.({ preventScroll: true })
+    $('quiz-screen').scrollIntoView?.({ block: 'start' })
   }
 
   function choose(letter) {
@@ -197,6 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
       button.setAttribute('aria-pressed', String(active))
     }
     $('btn-check').disabled = selected.size === 0
+    saveSession()
   }
 
   function checkAnswer() {
@@ -207,6 +331,15 @@ document.addEventListener('DOMContentLoaded', () => {
       selected.size === correct.length &&
       correct.every((letter) => selected.has(letter))
     if (success) $('score').textContent = ++score
+    results[index] = success
+    if (success) mistakes.delete(questions[index].uid)
+    else mistakes.add(questions[index].uid)
+    renderAnswer(success)
+    saveSession()
+  }
+
+  function renderAnswer(success) {
+    const correct = questions[index].correct_answers
     for (const button of $('options-container').children) {
       const letter = button.dataset.letter
       button.classList.add('answered')
@@ -229,7 +362,13 @@ document.addEventListener('DOMContentLoaded', () => {
   function nextQuestion() {
     if (!answered && !reviewMode()) return
     index++
-    if (index < questions.length) return loadQuestion()
+    if (index < questions.length) {
+      loadQuestion()
+      saveSession()
+      return
+    }
+    saved = null
+    persist()
     if (reviewMode()) return switchScreen('start')
     $('progress-bar-fill').style.width = '100%'
     $('final-score-value').textContent = score
@@ -242,12 +381,24 @@ document.addEventListener('DOMContentLoaded', () => {
           ? 'Хороший результат, но есть куда расти.'
           : 'Отличный результат!'
     switchScreen('result')
+    $('btn-result-mistakes').hidden = mistakes.size === 0
+    $('result-mistakes-count').textContent = mistakes.size ? `В списке на повторение: ${mistakes.size}. Правильный ответ при следующей попытке уберёт вопрос из списка.` : 'Все ошибки отработаны. Можно переходить к новой тренировке.'
   }
 
   $('section-select').addEventListener('change', updateSubsections)
   $('mode-select').addEventListener('change', updateSubsections)
   $('subsection-select').addEventListener('change', updateRanges)
-  $('btn-start').addEventListener('click', startQuiz)
+  $('range-select').addEventListener('change', updatePracticeSize)
+  for (const size of ['10', '20', '50', 'custom']) {
+    $(`size-${size}`).addEventListener('click', () => {
+      practiceSize = size
+      updatePracticeSize()
+    })
+  }
+  $('btn-start').addEventListener('click', () => startQuiz())
+  $('btn-resume').addEventListener('click', resumeQuiz)
+  $('btn-mistakes').addEventListener('click', () => startQuiz(true))
+  $('btn-result-mistakes').addEventListener('click', () => startQuiz(true))
   $('btn-check').addEventListener('click', checkAnswer)
   $('btn-next').addEventListener('click', nextQuestion)
   $('btn-restart').addEventListener('click', () => switchScreen('start'))

@@ -5,7 +5,7 @@ const vm = require('node:vm');
 const database = require('./questions.json');
 
 // Minimal DOM adapter: exercise the actual app event handlers without a browser dependency.
-function boot(data = database) {
+function boot(data = database, storage = new Map(), size = 'custom') {
     class Element {
         constructor(tag = 'div') {
             this.tag = tag; this.children = []; this.value = ''; this.textContent = '';
@@ -28,10 +28,13 @@ function boot(data = database) {
     elements['mode-select'].value = 'quiz';
     elements['section-select'].value = 'all';
     const context = {windowQuestions: data, Math, Set,
+        localStorage: {getItem: key => storage.get(key) ?? null, setItem: (key, value) => storage.set(key, value)},
         Option: class extends Element { constructor(text, value) { super('option'); this.textContent=text; this.value=value; } },
         document: {getElementById: id => elements[id], createElement: tag => new Element(tag),
             createTextNode: text => ({textContent:text}), addEventListener: (_, fn) => fn()}};
     vm.runInNewContext(fs.readFileSync(__dirname+'/app.js', 'utf8'), context);
+    // Existing scoring tests use the full, ordered range explicitly.
+    if (size !== '20') elements[`size-${size}`].click();
     return elements;
 }
 
@@ -108,4 +111,112 @@ test('literal option text is not interpreted as HTML', () => {
 test('missing data produces a visible error instead of a reference error', () => {
     const ui=boot([]);
     assert.match(ui['loading-screen'].textContent,/Ошибка загрузки базы/);
+});
+
+const choose = (ui, letter) => ui['options-container'].children.find(b => b.dataset.letter === letter).click();
+test('short practice samples unique verified questions within section and subsystem', () => {
+    const target = database.find(q => q.uid === '3.4.2:U:13');
+    for (const size of ['10', '20', '50']) {
+        const storage = new Map(), ui = boot(database, storage, size);
+        ui['section-select'].change(target.section); ui['subsection-select'].change(target.subsection);
+        ui['btn-start'].click();
+        const session = JSON.parse(storage.get('chle-progress-v1')).saved;
+        const pool = database.filter(q => q.section === target.section && q.subsection === target.subsection && q.status === 'verified');
+        assert.equal(session.ids.length, Math.min(Number(size), pool.length));
+        assert.equal(new Set(session.ids).size, session.ids.length);
+        assert.ok(session.ids.every(id => pool.some(q => q.uid === id)));
+        const resumed = boot(database, storage); resumed['btn-resume'].click();
+        assert.ok(resumed['question-text'].textContent.includes(database.find(q => q.uid === session.ids[0]).question));
+        assert.equal(JSON.parse(storage.get('chle-progress-v1')).saved.ids.join(','), session.ids.join(','));
+    }
+});
+
+test('short practice handles small and empty pools and preserves custom ranges', () => {
+    const ui = boot(database.slice(0, 3), new Map(), '20');
+    assert.ok(ui['practice-summary'].textContent.includes('меньше'));
+    ui['btn-start'].click(); assert.equal(ui['current-question-num'].textContent, 'Вопрос 1 из 3');
+    ui['btn-home'].click(); ui['section-select'].change('missing');
+    assert.equal(ui['btn-start'].disabled, true);
+    const storage = new Map(), custom = boot(database, storage);
+    custom['range-select'].change('50-100'); custom['btn-start'].click();
+    const expected = database.filter(q => q.status === 'verified').slice(50, 100).map(q => q.uid);
+    assert.equal(JSON.parse(storage.get('chle-progress-v1')).saved.ids.join(','), expected.join(','));
+    custom['btn-home'].click(); custom['size-10'].click();
+    assert.equal(custom['range-group'].hidden, true);
+    custom['btn-start'].click();
+    assert.equal(JSON.parse(storage.get('chle-progress-v1')).saved.ids.length, 10);
+});
+test('reload restores an answered question without awarding a second point', () => {
+    const data = database.slice(0, 2), storage = new Map();
+    let ui = boot(data, storage); ui['btn-start'].click(); choose(ui, data[0].correct_answers[0]);
+    ui = boot(data, storage);
+    assert.equal(ui['resume-panel'].hidden, false);
+    ui['btn-resume'].click();
+    assert.equal(Number(ui.score.textContent), 1);
+    assert.ok(ui['options-container'].children.every(b => b.disabled));
+    ui['btn-check'].click(); assert.equal(Number(ui.score.textContent), 1);
+    ui['btn-next'].click();
+    ui = boot(data, storage); ui['btn-resume'].click();
+    assert.ok(ui['question-text'].textContent.startsWith(`${data[1].id}.`));
+    assert.equal(ui['btn-next'].disabled, true);
+    assert.equal(Number(ui.score.textContent), 1);
+});
+
+test('unfinished multi-selection survives reload and is graded only on submission', () => {
+    const q = database.find(q => q.uid === '3.12:4'), storage = new Map();
+    let ui = boot([q], storage); ui['btn-start'].click(); choose(ui, 'A');
+    ui = boot([q], storage); ui['btn-resume'].click();
+    assert.equal(ui['options-container'].children.find(b => b.dataset.letter === 'A').attributes['aria-pressed'], 'true');
+    assert.equal(Number(ui.score.textContent), 0);
+    choose(ui, 'D'); ui['btn-check'].click();
+    assert.equal(Number(ui.score.textContent), 1);
+});
+
+test('mistakes persist, repeat independently of filters, and disappear after correct retry', () => {
+    const q = database[0], storage = new Map();
+    let ui = boot([q], storage); ui['btn-start'].click();
+    choose(ui, Object.keys(q.options).find(l => !q.correct_answers.includes(l)));
+    ui['btn-next'].click();
+    assert.equal(JSON.parse(storage.get('chle-progress-v1')).saved, null);
+    ui = boot([q], storage);
+    assert.equal(ui['mistake-count'].textContent, 1);
+    assert.equal(ui['mistake-list'].children.length, 1);
+    ui['section-select'].change('nonexistent');
+    ui['btn-mistakes'].click(); choose(ui, q.correct_answers[0]); ui['btn-next'].click();
+    ui = boot([q], storage);
+    assert.equal(ui['mistake-count'].textContent, 0);
+    assert.equal(ui['resume-panel'].hidden, true);
+});
+
+test('review mode resumes without scoring or adding ambiguous questions to mistakes', () => {
+    const data = database.filter(q => q.status === 'needs_review').slice(0, 2), storage = new Map();
+    let ui = boot(data, storage); ui['mode-select'].change('review'); ui['btn-start'].click(); ui['btn-next'].click();
+    ui = boot(data, storage); ui['btn-resume'].click();
+    assert.equal(ui['score-badge'].hidden, true);
+    assert.ok(ui['question-text'].textContent.startsWith(`${data[1].id}.`));
+    ui['btn-next'].click();
+    assert.equal(ui['mistake-count'].textContent, 0);
+    assert.equal(ui['resume-panel'].hidden, true);
+});
+
+test('invalid and outdated saves do not break the app or apply to changed questions', () => {
+    const q = database[0], storage = new Map([['chle-progress-v1', '{broken']]);
+    let ui = boot([q], storage); assert.equal(ui['resume-panel'].hidden, true);
+    ui['btn-start'].click();
+    const state = JSON.parse(storage.get('chle-progress-v1'));
+    state.saved.index = 400;
+    storage.set('chle-progress-v1', JSON.stringify(state));
+    ui = boot([q], storage); assert.equal(ui['resume-panel'].hidden, true);
+    ui['btn-start'].click();
+    ui = boot([{...q, question: q.question + ' Updated'}], storage);
+    assert.equal(ui['resume-panel'].hidden, true);
+    assert.ok(ui['storage-notice'].textContent.includes('обновилась'));
+});
+
+test('blocked storage still allows completing a quiz and reports the limitation', () => {
+    const q = database[0];
+    const ui = boot([q], {get() {throw Error('blocked')}, set() {throw Error('quota')}});
+    ui['btn-start'].click(); choose(ui, q.correct_answers[0]); ui['btn-next'].click();
+    assert.equal(Number(ui['final-score-value'].textContent), 1);
+    assert.ok(ui['storage-notice'].textContent.includes('не разрешил'));
 });
