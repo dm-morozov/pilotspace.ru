@@ -178,8 +178,10 @@ summary { cursor: pointer; min-height: 40px; align-content: center; }
 .support-payment { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; padding: 16px 18px; margin-top: 20px; background: var(--surface-soft); border: 1px solid var(--border); border-radius: 12px; }
 .support-requisites { flex: 1 1 245px; min-width: 0; }
 .support-requisites label { display: block; color: var(--muted); font-size: 11px; margin-bottom: 7px; }
-#support-card-number { display: block; width: 100%; border: none; padding: 0; border-radius: 0; color: var(--text); background: transparent; font: 500 clamp(16px, 4.3vw, 20px)/1.5 ui-monospace, Consolas, monospace; letter-spacing: .02em; }
-#btn-copy-card { width: auto; background: var(--surface); font-size: 13px; }
+#support-card-number, #support-phone-number { display: block; width: 100%; border: none; padding: 0; border-radius: 0; color: var(--text); background: transparent; font: 500 clamp(16px, 4.3vw, 20px)/1.5 ui-monospace, Consolas, monospace; letter-spacing: .02em; }
+.support-payment .btn { width: auto; background: var(--surface); font-size: 13px; }
+.support-recipient { display: block; margin-top: 5px; color: var(--muted); font-size: 11px; line-height: 1.5; }
+.support-card .support-comment { margin-top: 12px; color: var(--text); }
 .support-card .support-footer { margin-top: 16px; font-size: 11px; }
 .support-copy-status:empty { display: none; }
 .support-copy-status:not(:empty) { margin-top: 10px; }
@@ -250,7 +252,7 @@ summary { cursor: pointer; min-height: 40px; align-content: center; }
     .support-heading { gap: 12px; }
     .support-card h2 { font-size: 18px; }
     .support-payment { padding: 14px; gap: 14px; }
-    #btn-copy-card { width: 100%; }
+    .support-payment .btn { width: 100%; }
     .app-footer { width: calc(100% - 40px); margin: 24px auto; font-size: 10px; }
     .footer-contact { gap: 18px; padding: 24px 0; }
     .footer-author { flex-basis: 100%; }
