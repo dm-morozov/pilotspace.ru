@@ -7,7 +7,7 @@ import re
 import pymupdf
 
 BASE = Path(__file__).resolve().parent
-DEFAULT_PDF = BASE.parent / 'НОВЫЕ_Тестовые_вопросы_ЧЛЭ_ПОЛНОСТЬЮ_ВЫДЕЛЕНЫ.pdf'
+DEFAULT_PDF = BASE / 'НОВЫЕ_Тестовые_вопросы_ЧЛЭ_ПОЛНОСТЬЮ_ВЫДЕЛЕНЫ.pdf'
 REVIEWED_SHA256 = '687b82a836b348a4ab1dbd7d90aec93d8b9c1f3ac70da0d23c92649fc75d4402'
 LETTERS = str.maketrans({'А': 'A', 'В': 'B', 'С': 'C', 'Д': 'D', 'Е': 'E', 'Ф': 'F', 'Н': 'H'})
 HEADING = re.compile(r'^(3(?:\.\d+)+)\.?\s+(.+)')
@@ -72,6 +72,9 @@ def split_line(line):
         yield {'text': text[start:end], 'bbox': box, 'chars': chars}
 
 def parse(pages):
+    resolutions = json.loads((BASE/'answer_resolutions.json').read_text(encoding='utf8'))
+    if resolutions['pdf_sha256'] != REVIEWED_SHA256:
+        raise ValueError('Answer resolutions refer to a different PDF')
     questions, issues, headings, keys = [], [], {}, {}
     section = mode = current = opt = subsection = None
     key_lines = []
@@ -222,6 +225,26 @@ def parse(pages):
         if uid == '3.5.1:22':
             q['status'] = 'needs_review'
             q['review_reason'] = 'В исходном PDF символы после cos и sin отображаются пустыми квадратами. Полную запись формул восстановить однозначно нельзя.'
+        if uid == '3.4.4:G:3':
+            q['review_reason'] = 'В PDF повторяется буква A: таблица A, выделено 1/2, первый вариант — 1/4. Для окончательного решения нужна применимая редакция Boeing 767 FCOM, Flight Controls / Pitch Enhancement System; пересказов и карточек недостаточно.'
+        if uid in resolutions['entries']:
+            resolution = resolutions['entries'][uid]
+            expected = (resolution['expected_question'], resolution['expected_options'], resolution['expected_table'], resolution['expected_highlights'])
+            actual = (q['question'], q['options'], q['table_answers'], q['highlighted_answers'])
+            replacement = resolution.get('replacement_options')
+            if (actual != expected or not resolution['answers'] or not set(resolution['answers']) <= q['options'].keys()
+                    or (replacement is not None and (set(replacement) != set(q['options'])
+                        or not all(isinstance(value, str) and value.strip() for value in replacement.values())))):
+                issues.append({'type': 'resolution_mismatch', 'uid': uid})
+            else:
+                if replacement is not None:
+                    q['options'] = replacement.copy()
+                q['correct_answers'] = resolution['answers'][:]
+                q['status'] = 'verified'
+                q.pop('review_reason', None)
+                q['answer_resolution'] = {k: resolution[k] for k in ['reason', 'source', 'url']}
+                if resolution.get('editorial_note'):
+                    q['source_note'] = (q.get('source_note', '') + ' ' + resolution['editorial_note']).strip()
         if uid == '3.4.4:Q:7':
             q['source_note'] += ' Ответ A взят из таблицы: выделение находится на тексте вопроса.'
         if any(original and label != original for label, original in q['source_option_labels'].items()):
@@ -234,6 +257,8 @@ def parse(pages):
             issues.append({'type': 'missing_correct_option', 'uid': uid, 'key': key['answers'], 'options': list(q['options'])})
     for uid in keys.keys() - seen:
         issues.append({'type': 'missing_question', 'uid': uid})
+    for uid in resolutions['entries'].keys() - seen:
+        issues.append({'type': 'resolution_missing_question', 'uid': uid})
     return questions, keys, issues
 
 def attach_images(questions, pages, pdf, write=False):
@@ -311,19 +336,27 @@ def write_review(report, questions):
     lines = [
         '# Проверка базы по PDF', '',
         f'Источник: `{DEFAULT_PDF.name}`. Проверены все {report["pages"]} страниц; вопросы находятся на страницах PDF 23–479. Служебные страницы исключены.', '',
-        f'Найдено **{len(questions)} вопросов**, **{len(questions)} записей ключей**, **{report["verified"]} вопросов с однозначным ответом по источнику**. **{len(report["needs_review"])} вопросов доступны только для просмотра без оценки**. Восстановлено {report["images"]} иллюстраций/фрагментов с формулами.', '',
-        'Проверка устанавливает соответствие этому PDF, а не техническую правильность авиационных утверждений. Противоречия выделений и таблиц не исправлялись по предположениям.', '',
+        f'Найдено **{len(questions)} вопроса**, **{len(questions)} записи ключей**. **К тренировкам допущено {report["verified"]} вопроса**, **исключено до уточнения: {len(report["needs_review"])}**. Восстановлено {report["images"]} иллюстраций/фрагментов с формулами.', '',
+        'Базовая проверка устанавливает соответствие PDF и фиксирует точечные исправления ошибок ключа, а не независимую техническую правильность всей базы. Повторно исследованы все 14 прежних исключений. Для вопроса 3.5.1:22 формулы редакционно восстановлены, а ответ PDF исправлен по уравнениям установившегося набора. Детали и ограничения: QUESTION_REVIEW.md. Публичные копии FCOM не заменяют актуальную документацию авиакомпании.', '',
         f'SHA-256 PDF: `{report["pdf_sha256"]}`', '',
-        '## Вопросы, требующие уточнения у автора документа', '',
-        'Буквы в столбце «Выделено» — буквы приложения после восстановления последовательности A, B, C…; исходные буквы приведены в последнем столбце. У этих вопросов нет назначенного правильного ответа в тренажёре.', '',
-        '| Идентификатор | Страница PDF / ключ | Таблица | Выделено | Исходные буквы по порядку |',
-        '|---|---|---|---|---|',
     ]
-    for q in report['needs_review']:
-        labels = ', '.join(label or 'без буквы' for label in q['source_option_labels'].values())
-        lines.append(f'| {q["uid"]} | {", ".join(map(str, q["source_pages"]))} / {q["answer_source_page"]} | {", ".join(q["table_answers"])} | {", ".join(q["highlighted_answers"])} | {labels} |')
-    lines += ['', 'Причины:', '']
-    lines += [f'- **{q["uid"]}**: {q["review_reason"]}' for q in report['needs_review']]
+    if report['needs_review']:
+        lines += ['## Вопросы, требующие уточнения у автора документа', '',
+            'Буквы в столбце «Выделено» — буквы приложения после восстановления последовательности A, B, C…; исходные буквы приведены в последнем столбце. У этих вопросов нет назначенного правильного ответа в тренажёре.', '',
+            '| Идентификатор | Страница PDF / ключ | Таблица | Выделено | Исходные буквы по порядку |',
+            '|---|---|---|---|---|']
+        for q in report['needs_review']:
+            labels = ', '.join(label or 'без буквы' for label in q['source_option_labels'].values())
+            lines.append(f'| {q["uid"]} | {", ".join(map(str, q["source_pages"]))} / {q["answer_source_page"]} | {", ".join(q["table_answers"])} | {", ".join(q["highlighted_answers"])} | {labels} |')
+        lines += ['', 'Причины:', '']
+        lines += [f'- **{q["uid"]}**: {q["review_reason"]}' for q in report['needs_review']]
+    else:
+        lines += ['## Вопросы на уточнении', '', 'Нет: все 2854 вопроса допущены к тренировкам после проверки и задокументированных исправлений.', '']
+    lines += ['', '## Разрешённые расхождения', '', '| Вопрос | Ответ | Обоснование |', '|---|---|---|']
+    for q in questions:
+        if 'answer_resolution' in q:
+            r = q['answer_resolution']
+            lines.append(f"| {q['uid']} | {', '.join(q['correct_answers'])} | {r['reason']} Источник: {r['source']} |")
     lines += ['', '## Исправления переноса', '',
         '- Заголовки, подразделы, колонтитулы, номера страниц, ключи и библиография отделены от текста вопросов.',
         '- Идентификатор включает раздел, систему самолёта и исходный номер вопроса. Нумерация внутри систем не смешивается.',

@@ -8,13 +8,11 @@ document.addEventListener('DOMContentLoaded', () => {
     score = 0,
     answered = false,
     selected = new Set()
-  const reviewMode = () => $('mode-select').value === 'review'
   let practiceSize = '20'
-  const shortPractice = () => !reviewMode() && practiceSize !== 'custom'
+  const shortPractice = () => practiceSize !== 'custom'
 
   function updatePracticeSize() {
     const total = filteredQuestions().length
-    $('practice-size-group').hidden = reviewMode()
     $('range-group').hidden = shortPractice()
     $('shuffle-group').hidden = shortPractice()
     for (const size of ['10', '20', '50', 'custom']) {
@@ -30,9 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
       ? 'В этой теме нет доступных вопросов. Выберите другой раздел.'
       : shortPractice()
         ? `${count} из ${total} вопросов выбранной темы — случайная подборка без повторов.${total < Number(practiceSize) ? ' В теме меньше вопросов, поэтому включим все.' : ''}`
-        : `${count} вопросов выбранной темы. ${reviewMode() ? 'Просмотр без оценки.' : 'Порядок можно изменить переключателем ниже.'}`
+        : `${count} вопросов выбранной темы. Порядок можно изменить переключателем ниже.`
     $('btn-start').disabled = total === 0
-    $('btn-start').textContent = reviewMode() ? 'Посмотреть спорные вопросы' : `Начать · ${count} вопр.`
+    $('btn-start').textContent = `Начать · ${count} вопр.`
   }
   const storageKey = 'chle-progress-v1'
   const byId = new Map(allQuestions.map(q => [q.uid, q]))
@@ -50,14 +48,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   function validSession(s) {
-    if (!s || !['quiz', 'review'].includes(s.mode) || !Array.isArray(s.ids) || !s.ids.length ||
-        new Set(s.ids).size !== s.ids.length || !s.ids.every(id => byId.has(id) && byId.get(id).status === (s.mode === 'review' ? 'needs_review' : 'verified')) ||
+    if (!s || s.mode !== 'quiz' || !Array.isArray(s.ids) || !s.ids.length ||
+        new Set(s.ids).size !== s.ids.length || !s.ids.every(id => byId.has(id) && byId.get(id).status === 'verified') ||
         !Number.isInteger(s.index) || s.index < 0 || s.index >= s.ids.length ||
         !Array.isArray(s.results) || s.results.length !== s.ids.length ||
         !s.results.every((r, i) => (r === null || typeof r === 'boolean') && (i > s.index ? r === null : true)) ||
         !Array.isArray(s.selected) || new Set(s.selected).size !== s.selected.length ||
         !s.selected.every(letter => Object.hasOwn(byId.get(s.ids[s.index]).options, letter))) return false
-    if (s.mode === 'review') return s.results.every(r => r === null) && s.selected.length === 0
     const q = byId.get(s.ids[s.index])
     if (s.results.slice(0, s.index).some(r => r === null)) return false
     if (s.results[s.index] === null) return q.correct_answers.length > 1 || s.selected.length === 0
@@ -65,12 +62,69 @@ document.addEventListener('DOMContentLoaded', () => {
     return s.selected.length > 0 && s.results[s.index] === correct
   }
   function saveSession() {
-    saved = { ids: questions.map(q => q.uid), index, results: [...results], selected: [...selected], mode: reviewMode() ? 'review' : 'quiz' }
+    saved = { ids: questions.map(q => q.uid), index, results: [...results], selected: [...selected], mode: 'quiz' }
     persist()
   }
+  let pendingImport = null, importRequest = 0
+  function clearImport() {
+    pendingImport = null
+    $('import-preview').hidden = true
+  }
+  $('btn-export-progress').addEventListener('click', () => {
+    const data = { app: 'PilotSpace', version: 1, revision, saved, mistakes: [...mistakes] }
+    const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }))
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `pilotspace-progress-${new Date().toISOString().slice(0, 10)}.json`
+    document.body.append(link)
+    link.click()
+    link.remove()
+    setTimeout(() => URL.revokeObjectURL(url), 1000)
+    $('transfer-status').textContent = 'Файл подготовлен для скачивания. Храните его, чтобы восстановить прогресс.'
+  })
+  $('btn-import-progress').addEventListener('click', () => $('progress-file').click())
+  $('progress-file').addEventListener('change', async () => {
+    const request = ++importRequest
+    clearImport()
+    $('transfer-status').textContent = ''
+    const file = $('progress-file').files[0]
+    $('progress-file').value = ''
+    if (!file) return
+    try {
+      if (file.size > 2 * 1024 * 1024) throw new Error('Файл слишком большой. Выберите сохранение PilotSpace размером до 2 МБ.')
+      const data = JSON.parse(await file.text())
+      if (request !== importRequest) return
+      if (!data || data.app !== 'PilotSpace' || data.version !== 1) throw new Error('Это не поддерживаемое сохранение PilotSpace.')
+      if (data.revision !== revision) throw new Error('Сохранение создано для другой версии базы вопросов. Перенос отменён, чтобы не смешать ответы.')
+      if ((data.saved !== null && !validSession(data.saved)) || !Array.isArray(data.mistakes) ||
+          data.mistakes.length > byId.size || new Set(data.mistakes).size !== data.mistakes.length ||
+          !data.mistakes.every(id => byId.get(id)?.status === 'verified')) throw new Error('Данные сохранения повреждены. Текущий прогресс не изменён.')
+      pendingImport = { version: 1, revision, saved: data.saved, mistakes: data.mistakes }
+      $('import-summary').textContent = `В файле: ${data.saved ? `тренировка, вопрос ${data.saved.index + 1} из ${data.saved.ids.length}` : 'нет незавершённой тренировки'}; вопросов на повторение: ${data.mistakes.length}.`
+      $('import-preview').hidden = false
+    } catch (error) {
+      if (request === importRequest) $('transfer-status').textContent = error instanceof SyntaxError ? 'Не удалось прочитать JSON. Выберите файл сохранения PilotSpace.' : error.message
+    }
+  })
+  $('btn-cancel-import').addEventListener('click', () => { ++importRequest; clearImport(); $('transfer-status').textContent = 'Загрузка отменена. Ваш прогресс сохранён.' })
+  $('btn-confirm-import').addEventListener('click', () => {
+    if (!pendingImport) return
+    try {
+      // Write first: a storage failure must leave the current in-memory session intact.
+      localStorage.setItem(storageKey, JSON.stringify(pendingImport))
+    } catch {
+      $('transfer-status').textContent = 'Браузер не разрешил сохранить файл. Текущий прогресс не изменён.'
+      return
+    }
+    saved = pendingImport.saved
+    mistakes = new Set(pendingImport.mistakes)
+    clearImport()
+    refreshProgress()
+    $('transfer-status').textContent = 'Прогресс восстановлен. Можно продолжить тренировку или повторить ошибки.'
+  })
   function refreshProgress() {
     $('resume-panel').hidden = !saved
-    $('resume-description').textContent = saved ? `${saved.mode === 'review' ? 'Просмотр PDF' : 'Тренировка'} · вопрос ${saved.index + 1} из ${saved.ids.length} · отвечено: ${saved.results.filter(r => r !== null).length}` : ''
+    $('resume-description').textContent = saved ? `Тренировка · вопрос ${saved.index + 1} из ${saved.ids.length} · отвечено: ${saved.results.filter(r => r !== null).length}` : ''
     $('replace-notice').hidden = !saved
     $('mistake-count').textContent = mistakes.size
     $('btn-mistakes').disabled = mistakes.size === 0
@@ -104,9 +158,6 @@ document.addEventListener('DOMContentLoaded', () => {
   $('total-questions').textContent = allQuestions.filter(
     (q) => q.status === 'verified',
   ).length
-  $('review-count').textContent = allQuestions.filter(
-    (q) => q.status === 'needs_review',
-  ).length
   try {
     const raw = localStorage.getItem(storageKey)
     if (raw) {
@@ -127,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function filteredQuestions() {
     return allQuestions.filter(
       (q) =>
-        q.status === (reviewMode() ? 'needs_review' : 'verified') &&
+        q.status === 'verified' &&
         ($('section-select').value === 'all' ||
           q.section === $('section-select').value) &&
         ($('subsection-select').value === 'all' ||
@@ -155,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const matching = allQuestions.filter(
       (q) =>
         (section === 'all' || q.section === section) &&
-        q.status === (reviewMode() ? 'needs_review' : 'verified'),
+        q.status === 'verified',
     )
     $('subsection-select').replaceChildren(new Option('Все подразделы', 'all'))
     for (const sub of new Set(
@@ -170,7 +221,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function startQuiz(onlyMistakes = false) {
-    if (onlyMistakes) $('mode-select').value = 'quiz'
     questions = onlyMistakes ? [...mistakes].map(id => byId.get(id)) : filteredQuestions()
     const range = $('range-select').value
     if (!onlyMistakes && !shortPractice() && range !== 'all') {
@@ -188,7 +238,6 @@ document.addEventListener('DOMContentLoaded', () => {
     index = score = 0
     results = questions.map(() => null)
     $('score').textContent = '0'
-    $('score-badge').hidden = reviewMode()
     switchScreen('quiz')
     loadQuestion()
     saveSession()
@@ -201,10 +250,8 @@ document.addEventListener('DOMContentLoaded', () => {
     index = session.index
     results = [...session.results]
     score = results.filter(r => r === true).length
-    $('mode-select').value = session.mode
     updateSubsections()
     $('score').textContent = score
-    $('score-badge').hidden = reviewMode()
     switchScreen('quiz')
     loadQuestion()
     selected = new Set(session.selected)
@@ -243,6 +290,8 @@ document.addEventListener('DOMContentLoaded', () => {
       .filter(Boolean)
       .join(' · ')
     $('question-text').textContent = `${q.id}. ${q.question}`
+    const report = `Здравствуйте, Дмитрий!\n\nХочу сообщить об ошибке в PilotSpace.\nВопрос: ${q.uid}\nРаздел: ${q.section}\nСтраницы PDF: ${q.source_pages.join(', ')}\n${q.question.slice(0, 600)}\n\nЧто нужно исправить:\n`
+    $('report-question').href = `mailto:dem.morozov@gmail.com?subject=${encodeURIComponent(`PilotSpace: вопрос ${q.uid}`)}&body=${encodeURIComponent(report)}`
     $('question-source').replaceChildren(
       sourceLink(
         `PDF: стр. ${q.source_pages.join(', ')} (${q.source_printed_pages.join(', ')})`,
@@ -260,19 +309,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     $('question-note').textContent = q.source_note || ''
     $('answer-feedback').textContent = ''
-    $('answer-help').textContent = reviewMode()
-      ? 'Просмотр без оценки: ответ требует проверки по источнику.'
-      : q.correct_answers.length > 1
+    $('answer-help').textContent = q.correct_answers.length > 1
         ? 'Выберите все правильные варианты, затем нажмите «Проверить ответ».'
         : 'Выберите один правильный вариант.'
-    $('review-details').hidden = !reviewMode()
-    $('review-details').textContent = reviewMode()
-      ? `${q.review_reason} Таблица PDF: ${q.table_answers.join(', ')}. Выделены варианты приложения: ${q.highlighted_answers.join(', ') || 'нет'}. Исходные буквы: ${Object.entries(
-          q.source_option_labels,
-        )
-          .map(([label, original]) => `${label} → ${original || 'без буквы'}`)
-          .join('; ')}.`
-      : ''
     $('options-container').replaceChildren()
     for (const [letter, text] of Object.entries(q.options)) {
       const button = document.createElement('button')
@@ -287,25 +326,22 @@ document.addEventListener('DOMContentLoaded', () => {
       content.className = 'text'
       content.textContent = text
       button.append(label, content)
-      button.disabled = reviewMode()
       button.addEventListener('click', () => choose(letter))
       $('options-container').append(button)
     }
-    $('btn-check').hidden = reviewMode() || q.correct_answers.length === 1
+    $('btn-check').hidden = q.correct_answers.length === 1
     $('btn-check').disabled = true
-    $('btn-next').disabled = !reviewMode()
+    $('btn-next').disabled = true
     $('btn-next').textContent =
       index === questions.length - 1
-        ? reviewMode()
-          ? 'Закрыть просмотр'
-          : 'Завершить'
+        ? 'Завершить'
         : 'Далее'
     $('question-text').focus?.({ preventScroll: true })
     $('quiz-screen').scrollIntoView?.({ block: 'start' })
   }
 
   function choose(letter) {
-    if (answered || reviewMode()) return
+    if (answered) return
     const q = questions[index]
     if (q.correct_answers.length === 1) {
       selected = new Set([letter])
@@ -324,7 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function checkAnswer() {
-    if (answered || !selected.size || reviewMode()) return
+    if (answered || !selected.size) return
     answered = true
     const correct = questions[index].correct_answers
     const success =
@@ -359,8 +395,55 @@ document.addEventListener('DOMContentLoaded', () => {
     $('btn-next').disabled = false
   }
 
+  function renderSessionReview(onlyErrors = true) {
+    const errorCount = results.filter(result => result === false).length
+    $('review-errors').textContent = `Ошибки · ${errorCount}`
+    $('review-all').textContent = `Все · ${questions.length}`
+    $('review-errors').setAttribute('aria-pressed', String(onlyErrors))
+    $('review-all').setAttribute('aria-pressed', String(!onlyErrors))
+    $('review-count').textContent = onlyErrors ? `Ошибок в этой попытке: ${errorCount}` : `Вопросов в этой попытке: ${questions.length}`
+    $('review-empty').hidden = !onlyErrors || errorCount > 0
+    $('review-list').replaceChildren()
+    questions.forEach((q, position) => {
+      if (onlyErrors && results[position] !== false) return
+      const item = document.createElement('details')
+      item.className = 'review-item'
+      const summary = document.createElement('summary')
+      const status = document.createElement('span')
+      status.className = results[position] ? 'review-status is-correct' : 'review-status is-wrong'
+      status.textContent = results[position] ? 'Верно' : 'Ошибка'
+      const title = document.createElement('span')
+      title.textContent = `${position + 1}. ${q.question}`
+      summary.append(status, title)
+      const body = document.createElement('div')
+      body.className = 'review-body'
+      const section = document.createElement('p')
+      section.className = 'review-section'
+      section.textContent = [q.section, q.subsection].filter(Boolean).join(' · ')
+      const label = document.createElement('p')
+      label.className = 'review-answer-label'
+      label.textContent = q.correct_answers.length > 1 ? 'Правильные ответы' : 'Правильный ответ'
+      body.append(section, label)
+      for (const letter of q.correct_answers) {
+        const answer = document.createElement('p')
+        answer.className = 'review-answer'
+        answer.textContent = `${letter}. ${q.options[letter]}`
+        body.append(answer)
+      }
+      if (q.source_note) {
+        const note = document.createElement('p')
+        note.className = 'source-note'
+        note.textContent = q.source_note
+        body.append(note)
+      }
+      body.append(sourceLink(`Открыть вопрос в PDF · стр. ${q.source_pages[0]}`, q.source_pages[0]))
+      item.append(summary, body)
+      $('review-list').append(item)
+    })
+  }
+
   function nextQuestion() {
-    if (!answered && !reviewMode()) return
+    if (!answered) return
     index++
     if (index < questions.length) {
       loadQuestion()
@@ -369,7 +452,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     saved = null
     persist()
-    if (reviewMode()) return switchScreen('start')
     $('progress-bar-fill').style.width = '100%'
     $('final-score-value').textContent = score
     $('final-score-total').textContent = questions.length
@@ -381,12 +463,12 @@ document.addEventListener('DOMContentLoaded', () => {
           ? 'Хороший результат, но есть куда расти.'
           : 'Отличный результат!'
     switchScreen('result')
+    renderSessionReview()
     $('btn-result-mistakes').hidden = mistakes.size === 0
     $('result-mistakes-count').textContent = mistakes.size ? `В списке на повторение: ${mistakes.size}. Правильный ответ при следующей попытке уберёт вопрос из списка.` : 'Все ошибки отработаны. Можно переходить к новой тренировке.'
   }
 
   $('section-select').addEventListener('change', updateSubsections)
-  $('mode-select').addEventListener('change', updateSubsections)
   $('subsection-select').addEventListener('change', updateRanges)
   $('range-select').addEventListener('change', updatePracticeSize)
   for (const size of ['10', '20', '50', 'custom']) {
@@ -403,6 +485,14 @@ document.addEventListener('DOMContentLoaded', () => {
   $('btn-next').addEventListener('click', nextQuestion)
   $('btn-restart').addEventListener('click', () => switchScreen('start'))
   $('btn-home').addEventListener('click', () => switchScreen('start'))
+  $('brand-home').addEventListener('click', (event) => {
+    if (event?.ctrlKey || event?.metaKey || event?.shiftKey || event?.altKey) return
+    event?.preventDefault()
+    switchScreen('start')
+    $('start-screen').scrollIntoView?.({ block: 'start' })
+  })
+  $('review-errors').addEventListener('click', () => renderSessionReview(true))
+  $('review-all').addEventListener('click', () => renderSessionReview(false))
   updateSubsections()
   switchScreen('start')
 })

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#f4f6fa">
+    <title>Обновления — PilotSpace</title>
+    <meta name="description" content="Как развивается PilotSpace: история обновлений тренажёра ЧЛЭ, новые возможности и планы автора.">
+    <link rel="canonical" href="https://pilotspace.ru/updates.html">
+    <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="icons/icon-180.png">
+    <link rel="manifest" href="site.webmanifest">
+    <script src="theme.js?v=1"></script>
+    <link rel="stylesheet" href="styles.css?v=14">
+</head>
+<body class="updates-page">
+    <div id="app">
+        <header class="app-header">
+            <a href="index.html" class="brand brand-home" aria-label="PilotSpace. Тренажёр ЧЛЭ для пилотов">
+                <img class="brand-icon" src="favicon.svg?v=2" width="44" height="44" alt="">
+                <span class="brand-name">PilotSpace<span>Тренажёр ЧЛЭ для пилотов</span></span>
+            </a>
+            <div class="theme-switch" role="group" aria-label="Цветовая тема">
+                <button type="button" data-theme-choice="light" aria-label="Светлая тема" title="Светлая тема" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg></button>
+                <button type="button" data-theme-choice="system" aria-label="Тема устройства" title="Как на устройстве" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8m-4-4v4"/></svg></button>
+                <button type="button" data-theme-choice="dark" aria-label="Тёмная тема" title="Тёмная тема" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14A9 9 0 0 1 10 3a9 9 0 1 0 10.5 11Z"/></svg></button>
+            </div>
+        </header>
+        <main id="main-content">
+            <a class="back-to-practice" href="index.html">← К тренировкам</a>
+            <section class="updates-intro" aria-labelledby="updates-title">
+                <span class="eyebrow">Бортовой журнал PilotSpace</span>
+                <h1 id="updates-title">С каждым обновлением<br><span>ближе к вам.</span></h1>
+                <p>Здесь — важные изменения в тренажёре и следующие шаги. Чтобы вы знали, что стало удобнее и куда движется проект.</p>
+            </section>
+            <div class="updates-layout">
+                <section aria-labelledby="timeline-title">
+                    <h2 class="updates-section-title" id="timeline-title">История обновлений</h2>
+                    <ol class="release-timeline">
+                        <li class="release-entry" id="v1-1-0">
+                            <div class="release-meta"><time datetime="2026-09-27">27 сентября 2026</time><span class="release-badge">Версия 1.1.0</span></div>
+                            <h3>Подготовка там, где нет связи</h3>
+                            <p>Добавил офлайн-тренировки. Один раз скачайте материалы — и возвращайтесь к вопросам в дороге или в любом месте без интернета.</p>
+                            <ul>
+                                <li>Все 2854 вопроса и изображения доступны после скачивания небольшого пакета.</li>
+                                <li>Продолжение тренировки, работа над ошибками и разбор результата работают без сети.</li>
+                                <li>Новые версии не подменяют базу в открытой тренировке: готовое обновление включается после закрытия всех вкладок PilotSpace.</li>
+                                <li>PDF-источник и отправка сообщений по-прежнему требуют интернета.</li>
+                            </ul>
+                            <p class="release-support">Спасибо всем, кто поддерживает PilotSpace. Ваши переводы помогают мне оплачивать расходы проекта и выделять время на новые возможности. Если хотите помочь с дальнейшим развитием, можно <a href="index.html#support-section">поддержать следующую доработку</a>. Тренажёр остаётся бесплатным.</p>
+                        </li>
+                        <li class="release-entry" id="v1-0-0">
+                            <div class="release-meta"><time datetime="2026-09-27">27 сентября 2026</time><span class="release-badge">Версия 1.0.0</span></div>
+                            <h3>Знакомьтесь, PilotSpace</h3>
+                            <p>У тренажёра появилось своё имя и домен pilotspace.ru. С этого обновления начинаю вести журнал и нумеровать версии.</p>
+                            <ul>
+                                <li>Новый знак и иконки для вкладки браузера и экрана телефона.</li>
+                                <li>Шапка стала удобнее на небольших экранах.</li>
+                                <li>Источник и сообщение об ошибке перенёс под ответы и свернул в компактный блок, чтобы на телефоне сразу видеть вопрос и варианты.</li>
+                                <li>Отдельная страница обновлений — все важные изменения в одном месте.</li>
+                                <li>Добавил перенос прогресса через файл и сообщение об ошибке из вопроса.</li>
+                                <li>Добавил разбор завершённой тренировки: ошибки этой попытки, все вопросы и правильные ответы со ссылками на PDF.</li>
+                                <li>Сделал логотип и название ссылкой на главную — к настройкам можно вернуться, сохранив незавершённую тренировку.</li>
+                                <li>Повторно разобрал 14 спорных вопросов и вернул все в тренировки. Восстановил формулы набора высоты и исправил в тренажёре ошибочный ключ из PDF. Убрал отдельный режим из настроек.</li>
+                            </ul>
+                            <p class="release-support">Это обновление я подготовил в свободное время. Если стало удобнее учиться, можете <a href="index.html#support-section">угостить меня кофе</a> — каждый перевод помогает продолжать работу над PilotSpace.</p>
+                        </li>
+                        <li class="release-entry">
+                            <div class="release-meta"><time datetime="2026-09-21">21 сентября 2026</time><span class="release-era">До нумерации версий</span></div>
+                            <h3>Учиться в своём темпе</h3>
+                            <p>Обновил оформление и сделал тренировки удобнее для повседневной подготовки.</p>
+                            <ul>
+                                <li>Светлая, тёмная и автоматическая темы.</li>
+                                <li>Короткие тренировки и отдельное повторение ошибок.</li>
+                                <li>Продолжение незавершённой тренировки в том же браузере.</li>
+                            </ul>
+                        </li>
+                        <li class="release-entry">
+                            <div class="release-meta"><time datetime="2026-09-07">7 сентября 2026</time><span class="release-era">До нумерации версий</span></div>
+                            <h3>Начал с главного — вопросов</h3>
+                            <p>Пересобрал базу по исходному PDF, отделил вопросы и ответы от заголовков и колонтитулов.</p>
+                            <ul>
+                                <li>Добавил проверку полноты импорта и выделенных ответов.</li>
+                                <li>Неоднозначные вопросы вынес в просмотр без оценки.</li>
+                                <li>Добавил возможность открыть источник PDF.</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </section>
+                <aside class="updates-aside" aria-label="Планы и поддержка">
+                    <section class="updates-note">
+                        <span class="eyebrow">Следующий шаг</span>
+                        <h2>Проще найти свою тему</h2>
+                        <p>Дальше хочу сделать отдельные страницы разделов подготовки, чтобы нужные материалы было проще находить и открывать по прямой ссылке.</p>
+                        <div class="updates-later"><h3>На горизонте</h3><p>Личный кабинет, синхронизация между устройствами и доска идей с голосованием.</p></div>
+                        <p class="updates-fine-print">Это планы, а не готовые функции. Порядок может меняться: сначала исправляю ошибки и улучшаю подготовку.</p>
+                    </section>
+                    <section class="updates-note updates-thanks">
+                        <span class="eyebrow">С вашей поддержкой</span>
+                        <h2>Ваше участие важно</h2>
+                        <p>Меня зовут Дмитрий Морозов. Я один развиваю PilotSpace в свободное время. Ваши идеи, сообщения об ошибках и донаты помогают двигаться дальше.</p>
+                        <p>Чашка кофе для вас — поддержка и мотивация для меня. Тренажёр остаётся бесплатным для всех.</p>
+                        <a class="updates-action" href="index.html#support-section">Поддержать проект <span aria-hidden="true">↗</span></a>
+                        <a class="updates-contact" href="https://t.me/dem2014" target="_blank" rel="noopener noreferrer">Предложить идею в Telegram ↗</a>
+                        <span class="updates-signature">Дмитрий Морозов · автор PilotSpace</span>
+                    </section>
+                </aside>
+            </div>
+        </main>
+    </div>
+    <footer class="app-footer"><div class="footer-bottom"><span>PilotSpace · Учиться с комфортом</span><a href="index.html">Вернуться к тренировкам →</a></div></footer>
+</body>
+</html>

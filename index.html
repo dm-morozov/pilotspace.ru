@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#f4f6fa">
-    <meta name="description" content="Бесплатный тренажёр ЧЛЭ для пилотов: 2840 проверенных тестовых вопросов, подготовка по разделам, работа над ошибками и ссылки на источник PDF.">
+    <meta name="description" content="Бесплатный тренажёр ЧЛЭ для пилотов: 2854 проверенных тестовых вопроса, подготовка по разделам, работа над ошибками и ссылки на источник PDF.">
     <meta name="robots" content="index, follow, max-image-preview:large">
     <meta name="author" content="Морозов Дмитрий Павлович">
     <link rel="canonical" href="https://pilotspace.ru/">
@@ -13,12 +13,16 @@
     <meta property="og:site_name" content="PilotSpace">
     <meta property="og:url" content="https://pilotspace.ru/">
     <meta property="og:title" content="PilotSpace — тренажёр ЧЛЭ для пилотов">
-    <meta property="og:description" content="2840 проверенных тестовых вопросов, короткие тренировки и работа над ошибками. Бесплатно и без регистрации.">
+    <meta property="og:description" content="2854 проверенных тестовых вопроса, короткие тренировки и работа над ошибками. Бесплатно и без регистрации.">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="PilotSpace — тренажёр ЧЛЭ для пилотов">
-    <meta name="twitter:description" content="2840 проверенных тестовых вопросов, короткие тренировки и работа над ошибками.">
+    <meta name="twitter:description" content="2854 проверенных тестовых вопроса, короткие тренировки и работа над ошибками.">
     <title>PilotSpace — тренажёр ЧЛЭ для пилотов</title>
-    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="icons/icon-180.png">
+    <link rel="manifest" href="site.webmanifest">
+    <meta name="apple-mobile-web-app-title" content="PilotSpace">
+    <meta name="application-name" content="PilotSpace">
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -26,7 +30,7 @@
         "name": "PilotSpace",
         "alternateName": "Тренажёр ЧЛЭ для пилотов",
         "url": "https://pilotspace.ru/",
-        "description": "Бесплатный тренажёр для подготовки членов лётных экипажей по 2840 проверенным тестовым вопросам.",
+        "description": "Бесплатный тренажёр для подготовки членов лётных экипажей по 2854 проверенным тестовым вопросам.",
         "applicationCategory": "EducationalApplication",
         "operatingSystem": "Any",
         "inLanguage": "ru",
@@ -43,15 +47,15 @@
     }
     </script>
     <script src="theme.js?v=1"></script>
-    <link rel="stylesheet" href="styles.css?v=9">
+    <link rel="stylesheet" href="styles.css?v=14">
 </head>
 <body>
     <div id="app">
         <header class="app-header">
-            <div class="brand" aria-label="PilotSpace. Тренажёр ЧЛЭ для пилотов">
-                <span class="brand-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m21 3-7 18-3-8-8-3L21 3Z M11 13 21 3"/></svg></span>
+            <a id="brand-home" class="brand brand-home" href="index.html" aria-label="PilotSpace — на главную">
+                <img class="brand-icon" src="favicon.svg?v=2" width="44" height="44" alt="">
                 <span class="brand-name">PilotSpace<span>Тренажёр ЧЛЭ для пилотов</span></span>
-            </div>
+            </a>
             <div class="theme-switch" role="group" aria-label="Цветовая тема">
                 <button type="button" data-theme-choice="light" aria-label="Светлая тема" title="Светлая тема" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg></button>
                 <button type="button" data-theme-choice="system" aria-label="Тема устройства" title="Как на устройстве" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8m-4-4v4"/></svg></button>
@@ -60,6 +64,7 @@
         </header>
         <main id="main-content">
         <p id="storage-notice" class="storage-notice" role="status"></p>
+        <p id="offline-connection" class="connection-notice" role="status" hidden></p>
         <!-- Loading Screen -->
         <div id="loading-screen" class="screen active">
             <div class="loader"></div>
@@ -71,7 +76,8 @@
             <div class="intro">
                 <span class="eyebrow"><span class="status-dot"></span> В своём темпе. В любом месте.</span>
                 <h1>К следующему <br>полёту&nbsp;—<br><span>с уверенностью.</span></h1>
-                <p class="intro-description">Тренажёр ЧЛЭ помогает повторять теорию, проверять знания и готовиться к тестированию. По одному вопросу за раз.</p>
+                <p class="intro-description">PilotSpace — тренажёр ЧЛЭ для подготовки к проверке знаний. Выберите тему, пройдите короткую тренировку и повторите ошибки.</p>
+                <a class="release-link" href="updates.html#v1-1-0"><span>Теперь без интернета</span> Версия 1.1.0 <span aria-hidden="true">↗</span></a>
                 <div class="intro-stats">
                     <div><strong id="total-questions">—</strong><span>вопросов для практики</span></div>
                     <div><strong>Без оплаты</strong><span>и регистрации</span></div>
@@ -80,10 +86,6 @@
                     <svg viewBox="0 0 380 100" fill="none"><path d="M14 79H365M14 49H365M14 19H365M45 5v90m60-90v90m60-90v90m60-90v90m60-90v90m60-90v90" class="route-grid"/><path d="M28 76C113 77 122 28 189 30s105 30 158-13" class="route-path"/><circle cx="28" cy="76" r="4"/><path d="m343 9 13 2-5 13-2-9-6-6Z"/></svg>
                     <span>Знания — ваш надёжный ориентир</span>
                 </div>
-                <details class="audit-details">
-                    <summary>О базе вопросов <span class="count-chip" id="review-count">—</span></summary>
-                    <p>Некоторые вопросы в исходном PDF неоднозначны. Они доступны в отдельном режиме без оценки. <a href="SOURCE_REVIEW.md" target="_blank" rel="noopener">Открыть отчёт проверки</a></p>
-                </details>
             </div>
             
             <div class="settings">
@@ -100,13 +102,6 @@
                     <button id="btn-mistakes" class="btn secondary" type="button" disabled>Повторить ошибки</button>
                 </section>
                 <div class="settings-heading"><span class="eyebrow">Новая тренировка</span><h2>Что повторим сегодня?</h2><p>Выберите тему и удобный объём вопросов.</p></div>
-                <div class="form-group">
-                    <label for="mode-select">Режим</label>
-                    <select id="mode-select">
-                        <option value="quiz">Тренировка с оценкой</option>
-                        <option value="review">Спорные вопросы PDF — без оценки</option>
-                    </select>
-                </div>
                 <div class="form-group">
                     <label for="section-select">Раздел подготовки</label>
                     <select id="section-select">
@@ -138,8 +133,40 @@
                 <button id="btn-start" class="btn primary">Начать тест</button>
                 <p id="replace-notice" class="settings-footnote" hidden>Начало новой тренировки или повторения ошибок заменит незавершённую тренировку. Список ошибок сохранится.</p>
                 <p class="settings-footnote">Без таймера. Можно спокойно обдумать ответ.</p>
-                <p class="settings-footnote">Прогресс сохраняется автоматически в этом браузере. При очистке данных сайта он удалится. Между устройствами не переносится.</p>
+                <p class="settings-footnote">Прогресс сохраняется автоматически в этом браузере. При очистке данных сайта он удалится. Перенести его на другое устройство можно через файл.</p>
+                <details class="progress-transfer">
+                    <summary>Сохранить или перенести прогресс</summary>
+                    <p>Скачайте файл и откройте его здесь на другом устройстве. Он содержит незавершённую тренировку и список ошибок.</p>
+                    <div class="transfer-actions"><button id="btn-export-progress" class="btn secondary" type="button">Скачать сохранение</button><button id="btn-import-progress" class="btn secondary" type="button">Загрузить файл</button></div>
+                    <input id="progress-file" type="file" accept=".json,application/json" hidden>
+                    <div id="import-preview" hidden>
+                        <p id="import-summary"></p>
+                        <p>Текущая тренировка и список ошибок будут заменены. При необходимости сначала скачайте своё сохранение.</p>
+                        <div class="transfer-actions"><button id="btn-confirm-import" class="btn primary" type="button">Заменить прогресс</button><button id="btn-cancel-import" class="btn secondary" type="button">Отмена</button></div>
+                    </div>
+                    <p id="transfer-status" role="status" aria-live="polite"></p>
+                </details>
             </div>
+            <section class="offline-card" aria-labelledby="offline-title">
+                <div class="offline-intro">
+                    <span class="eyebrow">Возьмите подготовку с собой</span>
+                    <h2 id="offline-title">Тренировки без интернета</h2>
+                    <p>Все вопросы и изображения — в вашем браузере. Для дороги и мест, где нет связи.</p>
+                    <p class="offline-meta">Размер пакета: <span id="offline-size">около 9 МБ</span> · Без установки приложения</p>
+                </div>
+                <div class="offline-controls">
+                    <button id="btn-offline" class="btn secondary" type="button" disabled>Проверяю доступность…</button>
+                    <progress id="offline-progress" aria-label="Скачивание материалов" hidden></progress>
+                    <p id="offline-status" role="status" aria-live="polite">Для настройки скачивания нужен JavaScript.</p>
+                    <details class="offline-help">
+                        <summary>Как пользоваться в дороге</summary>
+                        <p>Скачайте пакет и дождитесь сообщения «Готово». Перед поездкой проверьте: отключите интернет и откройте сайт заново.</p>
+                        <p>Открывайте тот же адрес в том же браузере. Можно добавить сайт на главный экран через меню браузера. PDF-источник и отправка писем требуют интернета.</p>
+                        <p>Браузер может очистить скачанные файлы при нехватке места или удалении данных сайта. Прогресс можно отдельно сохранить в файл выше.</p>
+                        <p>После включения офлайн-режима браузер может скачивать новые версии при посещении сайта с интернетом. Чтобы применить готовое обновление, завершите тренировку и закройте все вкладки PilotSpace. При изменении базы сохранение старой тренировки может стать несовместимым.</p>
+                    </details>
+                </div>
+            </section>
         </div>
 
         <!-- Quiz Screen -->
@@ -158,14 +185,21 @@
             <div class="question-container">
                 <div id="question-section" class="section-tag">Раздел</div>
                 <h2 id="question-text" tabindex="-1">Текст вопроса</h2>
-                <details id="source-details" class="source-details"><summary>Источник и примечания</summary><div id="question-source" class="source-links"></div><p id="question-note" class="source-note"></p></details>
                 <div id="question-images"></div>
                 <p id="answer-help"></p>
-                <p id="review-details" class="audit-notice" hidden></p>
                 <div id="options-container" class="options">
                     <!-- Options will be injected here -->
                 </div>
                 <p id="answer-feedback" role="status" aria-live="polite"></p>
+                <details id="source-details" class="source-details">
+                    <summary>Источник и обратная связь</summary>
+                    <div class="source-content">
+                        <div id="question-source" class="source-links"></div>
+                        <p id="question-note" class="source-note"></p>
+                        <a id="report-question" class="report-question" href="mailto:dem.morozov@gmail.com">Сообщить об ошибке ↗</a>
+                        <p class="report-hint">В письме уже будет номер вопроса — добавьте описание ошибки.</p>
+                    </div>
+                </details>
             </div>
             
             <div class="quiz-footer">
@@ -191,6 +225,18 @@
                     <button id="btn-restart" class="btn primary">Начать заново</button>
                 </div>
             </div>
+            <section class="session-review" aria-labelledby="review-title">
+                <div class="review-heading">
+                    <h2 id="review-title">Разбор тренировки</h2>
+                    <p id="review-count" class="review-count" role="status"></p>
+                </div>
+                <div class="review-filters" role="group" aria-label="Какие вопросы показать">
+                    <button id="review-errors" type="button" aria-pressed="true">Ошибки</button>
+                    <button id="review-all" type="button" aria-pressed="false">Все вопросы</button>
+                </div>
+                <p id="review-empty" class="review-empty" hidden>В этой тренировке ошибок нет. Можно открыть все вопросы и повторить ответы.</p>
+                <div id="review-list" class="review-list"></div>
+            </section>
         </div>
         </main>
         <section id="support-section" class="support-card" aria-labelledby="support-title" hidden>
@@ -206,7 +252,7 @@
                     <h2 id="support-title">Угостить автора кофе</h2>
                 </div>
             </div>
-            <p>Если тренажёр оказался вам полезен, вы можете поддержать проект любой суммой. Для вас это может быть чашка кофе, а для меня — большой вклад в развитие приложения.</p>
+            <p>Я — Дмитрий Морозов, один развиваю PilotSpace в свободное время. Если тренажёр оказался вам полезен, вы можете поддержать проект любой суммой. Для вас это может быть чашка кофе, а для меня — большой вклад в развитие приложения.</p>
             <p>В комментарии к переводу можно написать, чего вам не хватает в тренажёре. Я постараюсь постепенно воплощать ваши пожелания, чтобы учиться было ещё удобнее.</p>
             <div class="support-payment">
                 <div class="support-requisites">
@@ -229,7 +275,7 @@
         </section>
     </div>
 
-    <script src="questions.js?v=3"></script>
+    <script src="questions.js?v=4"></script>
     <footer class="app-footer">
         <div class="footer-contact">
             <div class="footer-author">
@@ -242,9 +288,10 @@
                 <a href="https://t.me/dem2014" target="_blank" rel="noopener noreferrer"><span>Telegram ↗</span>@dem2014</a>
             </div>
         </div>
-        <div class="footer-bottom"><span>PilotSpace · Учиться с комфортом</span><span>Бесплатно. Для тех, кто в небе.</span></div>
+        <div class="footer-bottom"><span>PilotSpace · Учиться с комфортом</span><a href="updates.html">История обновлений · 1.1.0</a><span>Бесплатно. Для тех, кто в небе.</span></div>
     </footer>
-    <script src="app.js?v=7"></script>
+    <script src="app.js?v=10"></script>
     <script src="support.js?v=2"></script>
+    <script src="offline.js?v=1"></script>
 </body>
 </html>

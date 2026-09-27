@@ -40,11 +40,30 @@ class ImportTests(unittest.TestCase):
                 self.assertEqual(q['correct_answers'], [])
                 self.assertTrue(q['review_reason'])
             else:
-                self.assertEqual(q['correct_answers'], self.keys[q['uid']]['answers'])
+                if 'answer_resolution' not in q:
+                    self.assertEqual(q['correct_answers'], self.keys[q['uid']]['answers'])
                 self.assertTrue(set(q['correct_answers']) <= q['options'].keys())
-                if q['uid'] != '3.4.4:Q:7':
+                if q['uid'] != '3.4.4:Q:7' and 'answer_resolution' not in q:
                     self.assertEqual(q['correct_answers'], q['highlighted_answers'], q['uid'])
-        self.assertEqual(len(review), 14)
+        self.assertEqual(review, [])
+
+    def test_reviewed_answers_are_explicit_and_raw_evidence_is_preserved(self):
+        expected = {'3.4.1:C:14': 'C', '3.4.1:K:7': 'A', '3.4.2:E:8': 'A',
+                    '3.4.2:I:9': 'B', '3.4.2:I:16': 'C', '3.4.2:L:17': 'C', '3.4.2:O:30': 'C',
+                    '3.4.2:Q:3': 'C', '3.4.2:T:1': 'C', '3.4.2:U:22': 'C',
+                    '3.4.2:U:23': 'C', '3.4.4:B:13': 'A',
+                    '3.4.4:G:3': 'A', '3.5.1:22': 'B'}
+        self.assertEqual({q['uid'] for q in self.questions if 'answer_resolution' in q}, set(expected))
+        for uid, answer in expected.items():
+            q = self.by_id[uid]
+            self.assertEqual(q['correct_answers'], [answer])
+            self.assertTrue(q['answer_resolution']['reason'])
+        self.assertEqual(self.by_id['3.4.2:E:8']['highlighted_answers'], ['B'])
+        self.assertEqual(self.by_id['3.4.2:U:22']['highlighted_answers'], ['B', 'C'])
+        self.assertEqual(self.by_id['3.4.4:G:3']['options']['A'], '1/4')
+        self.assertEqual(self.by_id['3.4.4:G:3']['highlighted_answers'], ['C'])
+        self.assertEqual(self.by_id['3.5.1:22']['options']['B'], 'Y = G · cos γ, P = X + G · sin γ.')
+        self.assertEqual(self.by_id['3.5.1:22']['table_answers'], ['A'])
 
     def test_reported_flexible_takeoff_regression(self):
         for uid in ['3.5.2:32', '3.5.3:33']:
@@ -64,7 +83,7 @@ class ImportTests(unittest.TestCase):
         self.assertEqual(len(self.by_id['3.4.1:I:8']['options']), 4)
         self.assertEqual(self.by_id['3.4.1:I:8']['options']['A'], 'The Fuel Metering Unit')
         self.assertEqual(self.by_id['3.4.2:E:8']['options'], {'A': 'AC BUS', 'B': 'DC BUS', 'C': 'AC and DC BUSs'})
-        self.assertEqual(self.by_id['3.4.2:I:9']['status'], 'needs_review')
+        self.assertEqual(self.by_id['3.4.2:I:9']['correct_answers'], ['B'])
         self.assertEqual(len(self.by_id['3.4.2:G:10']['options']), 3)
         self.assertEqual(len(self.by_id['3.4.2:U:17']['options']), 3)
         self.assertIn('0.45qt/h)', self.by_id['3.4.2:U:17']['options']['A'])

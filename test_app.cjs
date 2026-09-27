@@ -25,7 +25,6 @@ function boot(data = database, storage = new Map(), size = 'custom') {
     const elements = {};
     const html = fs.readFileSync(__dirname+'/index.html', 'utf8');
     for (const match of html.matchAll(/<([a-z0-9]+)[^>]*\bid="([^"]+)"/g)) elements[match[2]] = new Element(match[1]);
-    elements['mode-select'].value = 'quiz';
     elements['section-select'].value = 'all';
     const context = {windowQuestions: data, Math, Set,
         localStorage: {getItem: key => storage.get(key) ?? null, setItem: (key, value) => storage.set(key, value)},
@@ -53,6 +52,46 @@ test('single-answer scoring locks repeated clicks and resets on restart', () => 
     assert.equal(ui['btn-next'].disabled, true);
 });
 
+test('brand returns home without losing an answered training session', () => {
+    const q=database[0], ui=boot([q]);
+    ui['btn-start'].click();
+    ui['options-container'].children.find(b=>b.dataset.letter===q.correct_answers[0]).click();
+    ui['brand-home'].click();
+    assert.ok(ui['start-screen'].classes.has('active'));
+    assert.equal(ui['btn-resume'].hidden,false);
+    ui['btn-resume'].click();
+    assert.equal(Number(ui.score.textContent),1);
+    assert.equal(ui['btn-next'].disabled,false);
+});
+
+test('completion review separates current errors and shows complete correct answer sets', () => {
+    const q1=database[0], q2=database.find(q=>q.uid==='3.12:4'), ui=boot([q1,q2]);
+    ui['btn-start'].click();
+    ui['options-container'].children.find(b=>b.dataset.letter===q1.correct_answers[0]).click();
+    ui['btn-next'].click();
+    ui['options-container'].children.find(b=>b.dataset.letter==='A').click();
+    ui['btn-check'].click(); ui['btn-next'].click();
+    assert.equal(ui['review-list'].children.length,1);
+    const body=ui['review-list'].children[0].children[1];
+    const answers=body.children.filter(el=>el.className==='review-answer').map(el=>el.textContent);
+    assert.deepEqual(answers,q2.correct_answers.map(letter=>`${letter}. ${q2.options[letter]}`));
+    ui['review-all'].click();
+    assert.equal(ui['review-list'].children.length,2);
+    ui['review-errors'].click();
+    assert.equal(ui['review-list'].children.length,1);
+});
+
+test('perfect completion offers an empty error state and all questions', () => {
+    const q=database[0], ui=boot([q]); ui['btn-start'].click();
+    ui['options-container'].children.find(b=>b.dataset.letter===q.correct_answers[0]).click();
+    ui['btn-next'].click();
+    assert.equal(ui['review-empty'].hidden,false);
+    assert.equal(ui['review-list'].children.length,0);
+    ui['review-all'].click();
+    assert.equal(ui['review-empty'].hidden,true);
+    assert.equal(ui['review-list'].children.length,1);
+});
+
 test('multiple answers require the complete set and reject extra choices', () => {
     const q = database.find(q=>q.uid==='3.12:4');
     for (const [choice, expected] of [[['A'],0], [['A','D'],1], [['A','B','D'],0]]) {
@@ -74,18 +113,25 @@ test('deselecting the only multi-answer choice disables submission', () => {
     assert.equal(ui['btn-check'].disabled, true);
 });
 
-test('source ambiguities are excluded from quizzes and never scored in review', () => {
+test('all reviewed questions enter training and review selector is absent', () => {
     const ui=boot();
-    assert.equal(ui['total-questions'].textContent,2840);
-    assert.equal(ui['review-count'].textContent,14);
-    ui['mode-select'].change('review'); ui['btn-start'].click();
-    assert.equal(ui['current-question-num'].textContent,'Вопрос 1 из 14');
-    assert.equal(ui['btn-check'].hidden,true);
-    assert.equal(ui['score-badge'].hidden,true);
-    assert.ok(ui['options-container'].children.every(b=>b.disabled));
-    for(let i=0;i<14;i++) ui['btn-next'].click();
-    assert.ok(ui['start-screen'].classes.has('active'));
-    assert.equal(Number(ui.score.textContent),0);
+    assert.equal(ui['total-questions'].textContent,2854);
+    assert.equal(ui['mode-select'],undefined);
+    const data=database.filter(q=>q.status==='needs_review');
+    assert.equal(data.length,0);
+    assert.equal(database.find(q=>q.uid==='3.4.4:G:3').correct_answers[0],'A');
+    assert.equal(database.find(q=>q.uid==='3.5.1:22').correct_answers[0],'B');
+});
+
+test('revised PES and climb answers are scored by the corrected key', () => {
+    for (const [uid, correct, wrong] of [['3.4.4:G:3', 'A', 'C'], ['3.5.1:22', 'B', 'A']]) {
+        const q=database.find(item=>item.uid===uid);
+        for (const [choice, expected] of [[correct,1],[wrong,0]]) {
+            const ui=boot([q]); ui['btn-start'].click();
+            ui['options-container'].children.find(button=>button.dataset.letter===choice).click();
+            assert.equal(Number(ui.score.textContent),expected,`${uid}: ${choice}`);
+        }
+    }
 });
 
 test('section and subsystem filters and source illustrations remain usable', () => {
@@ -188,15 +234,14 @@ test('mistakes persist, repeat independently of filters, and disappear after cor
     assert.equal(ui['resume-panel'].hidden, true);
 });
 
-test('review mode resumes without scoring or adding ambiguous questions to mistakes', () => {
-    const data = database.filter(q => q.status === 'needs_review').slice(0, 2), storage = new Map();
-    let ui = boot(data, storage); ui['mode-select'].change('review'); ui['btn-start'].click(); ui['btn-next'].click();
-    ui = boot(data, storage); ui['btn-resume'].click();
-    assert.equal(ui['score-badge'].hidden, true);
-    assert.ok(ui['question-text'].textContent.startsWith(`${data[1].id}.`));
-    ui['btn-next'].click();
-    assert.equal(ui['mistake-count'].textContent, 0);
-    assert.equal(ui['resume-panel'].hidden, true);
+test('old review sessions cannot be resumed or imported as scored training', async () => {
+    const {q,data}=exportedFixture(), storage=new Map();
+    const legacy={...data,saved:{...data.saved,mode:'review'}};
+    storage.set('chle-progress-v1',JSON.stringify(legacy));
+    const ui=boot([q],storage);
+    assert.equal(ui['resume-panel'].hidden,true);
+    await importFile(ui,legacy);
+    assert.equal(ui['import-preview'].hidden,true);
 });
 
 test('invalid and outdated saves do not break the app or apply to changed questions', () => {
@@ -219,4 +264,58 @@ test('blocked storage still allows completing a quiz and reports the limitation'
     ui['btn-start'].click(); choose(ui, q.correct_answers[0]); ui['btn-next'].click();
     assert.equal(Number(ui['final-score-value'].textContent), 1);
     assert.ok(ui['storage-notice'].textContent.includes('не разрешил'));
+});
+
+async function importFile(ui, data) {
+    const text = typeof data === 'string' ? data : JSON.stringify(data);
+    ui['progress-file'].files = [{size: text.length, text: async () => text}];
+    await ui['progress-file'].listeners.change();
+}
+function exportedFixture() {
+    const storage = new Map(), q = database[0], ui = boot([q], storage);
+    ui['btn-start'].click();
+    ui['options-container'].children.find(b => b.dataset.letter !== q.correct_answers[0]).click();
+    return {q, data: {app: 'PilotSpace', ...JSON.parse(storage.get('chle-progress-v1'))}};
+}
+test('import previews without mutation, cancels, then restores a session and mistakes', async () => {
+    const {q,data} = exportedFixture(), storage = new Map(), ui = boot([q],storage);
+    await importFile(ui,data);
+    assert.equal(ui['import-preview'].hidden,false);
+    assert.equal(storage.size,0);
+    ui['btn-cancel-import'].click();
+    ui['btn-confirm-import'].click();
+    assert.equal(storage.size,0);
+    await importFile(ui,data);
+    ui['btn-confirm-import'].click();
+    assert.equal(ui['mistake-count'].textContent,1);
+    ui['btn-resume'].click();
+    assert.equal(ui['answer-feedback'].textContent.startsWith('Неверно.'),true);
+    assert.equal(Number(ui.score.textContent),0);
+});
+test('invalid imports never replace current progress', async () => {
+    const {q,data} = exportedFixture(), storage = new Map(), ui = boot([q],storage);
+    ui['btn-start'].click();
+    const before=storage.get('chle-progress-v1');
+    for(const invalid of ['{', null, {...data,revision:0}, {...data,mistakes:['unknown']}, {...data,saved:{...data.saved,index:99}}]) {
+        await importFile(ui, invalid);
+        assert.equal(ui['import-preview'].hidden,true);
+        ui['btn-confirm-import'].click();
+        assert.equal(storage.get('chle-progress-v1'),before);
+    }
+});
+test('storage failure during import preserves the live session', async () => {
+    const {q,data} = exportedFixture(), storage = new Map(), ui = boot([q],storage);
+    ui['btn-start'].click();
+    storage.set=()=>{throw new Error('blocked')};
+    await importFile(ui,data); ui['btn-confirm-import'].click();
+    assert.match(ui['transfer-status'].textContent,/не разрешил/);
+    ui['btn-resume'].click();
+    assert.equal(ui['btn-next'].disabled,true);
+    assert.equal(ui['mistake-count'].textContent,0);
+});
+test('question report includes its stable id and PDF pages', () => {
+    const q=database[0], ui=boot([q]); ui['btn-start'].click();
+    const report=decodeURIComponent(ui['report-question'].href);
+    assert.ok(report.includes(q.uid));
+    assert.ok(report.includes('Страницы PDF: '+q.source_pages.join(', ')));
 });
