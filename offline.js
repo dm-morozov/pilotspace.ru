@@ -53,6 +53,7 @@
       try {
         const data = await ask(registration.active, 'STATUS');
         ready = data.complete;
+        window.dispatchEvent(new CustomEvent('pilotspace-offline-ready', {detail: ready}));
         if (ready) {
           $('offline-size').textContent = sizeText(data.bytes);
           const controlled = !!navigator.serviceWorker.controller;
@@ -63,7 +64,7 @@
           if (failure) status.textContent += ' ' + failure;
           return;
         }
-      } catch { ready = false; }
+      } catch { ready = false; window.dispatchEvent(new CustomEvent('pilotspace-offline-ready', {detail: false})); }
       status.textContent = failure || 'Скачанная копия неполная или браузер очистил её. Скачайте материалы повторно перед поездкой.';
       setButton('Скачать повторно', 'repair', !navigator.onLine);
       return;

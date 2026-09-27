@@ -383,3 +383,12 @@ summary { cursor: pointer; min-height: 40px; align-content: center; }
 .report-question { display: inline-flex; align-items: center; min-height: 44px; color: var(--accent); font-size: 12px; }
 .report-hint { color: var(--muted); font-size: 11px; line-height: 1.6; margin: 0; }
 .release-entry .release-support { border-left: 2px solid var(--border); padding-left: 14px; margin-top: 20px; font-size: 13px; }
+
+/* Installation stays inside the home screen and never overlays a question. */
+.install-panel { border-top: 1px solid var(--border-color, #65758a); padding-top: 1rem; margin-top: 1.25rem; }
+.install-offer { display: flex; gap: .75rem; align-items: flex-start; margin-bottom: .85rem; }
+.install-offer[hidden], .install-panel[hidden] { display: none; }
+.install-offer strong { font-size: 1rem; }
+.install-offer p, .install-caption, #install-help p { font-size: .875rem; line-height: 1.5; margin: .5rem 0; }
+.install-offer .text-button { flex-shrink: 0; min-height: 44px; }
+.install-caption { color: var(--text-muted); }

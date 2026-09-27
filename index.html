@@ -54,7 +54,7 @@
     }
     </script>
     <script src="theme.js?v=1"></script>
-    <link rel="stylesheet" href="styles.css?v=15">
+    <link rel="stylesheet" href="styles.css?v=16">
 </head>
 <body>
     <div id="app">
@@ -85,7 +85,7 @@
                 <h1>К следующему <br>полёту&nbsp;—<br><span>с уверенностью.</span></h1>
                 <p class="intro-description">PilotSpace — тренажёр ЧЛЭ для подготовки к проверке знаний. Выберите тему, пройдите короткую тренировку и повторите ошибки.</p>
                 <a class="release-link" href="sections/index.html">Все разделы подготовки →</a>
-                <a class="release-link" href="updates.html#v1-2-0"><span>Что нового</span> Версия 1.2.0 <span aria-hidden="true">↗</span></a>
+                <a class="release-link" href="updates.html#v1-3-0"><span>Что нового</span> Версия 1.3.0 <span aria-hidden="true">↗</span></a>
                 <div class="intro-stats">
                     <div><strong id="total-questions">—</strong><span>вопросов для практики</span></div>
                     <div><strong>Без оплаты</strong><span>и регистрации</span></div>
@@ -166,6 +166,15 @@
                     <button id="btn-offline" class="btn secondary" type="button" disabled>Проверяю доступность…</button>
                     <progress id="offline-progress" aria-label="Скачивание материалов" hidden></progress>
                     <p id="offline-status" role="status" aria-live="polite">Для настройки скачивания нужен JavaScript.</p>
+                    <div id="install-panel" class="install-panel" hidden>
+                        <div id="install-offer" class="install-offer" hidden>
+                            <div><strong>PilotSpace готов к дороге</strong><p>Добавьте приложение на главный экран — тренировки будут под рукой.</p></div>
+                            <button id="btn-dismiss-install" class="text-button" type="button" aria-label="Скрыть предложение установки на неделю">Позже</button>
+                        </div>
+                        <button id="btn-install" class="btn secondary" type="button" aria-controls="install-help" aria-expanded="false">Установить PilotSpace</button>
+                        <p class="install-caption">Установка добавит иконку приложения. Для занятий без сети отдельно скачайте офлайн-пакет выше.</p>
+                        <div id="install-help" hidden><p id="install-hint"></p></div>
+                    </div>
                     <details class="offline-help">
                         <summary>Как пользоваться в дороге</summary>
                         <p>Скачайте пакет и дождитесь сообщения «Готово». Перед поездкой проверьте: отключите интернет и откройте сайт заново.</p>
@@ -296,10 +305,11 @@
                 <a href="https://t.me/dem2014" target="_blank" rel="noopener noreferrer"><span>Telegram ↗</span>@dem2014</a>
             </div>
         </div>
-        <div class="footer-bottom"><span>PilotSpace · Учиться с комфортом</span><a href="updates.html">История обновлений · 1.2.0</a><span>Бесплатно. Для тех, кто в небе.</span></div>
+        <div class="footer-bottom"><span>PilotSpace · Учиться с комфортом</span><a href="updates.html">История обновлений · 1.3.0</a><span>Бесплатно. Для тех, кто в небе.</span></div>
     </footer>
     <script src="app.js?v=10"></script>
     <script src="support.js?v=2"></script>
-    <script src="offline.js?v=1"></script>
+    <script src="install.js?v=1"></script>
+    <script src="offline.js?v=2"></script>
 </body>
 </html>
