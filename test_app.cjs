@@ -5,7 +5,7 @@ const vm = require('node:vm');
 const database = require('./questions.json');
 
 // Minimal DOM adapter: exercise the actual app event handlers without a browser dependency.
-function boot(data = database, storage = new Map(), size = 'custom') {
+function boot(data = database, storage = new Map(), size = 'custom', search = '') {
     class Element {
         constructor(tag = 'div') {
             this.tag = tag; this.children = []; this.value = ''; this.textContent = '';
@@ -26,7 +26,7 @@ function boot(data = database, storage = new Map(), size = 'custom') {
     const html = fs.readFileSync(__dirname+'/index.html', 'utf8');
     for (const match of html.matchAll(/<([a-z0-9]+)[^>]*\bid="([^"]+)"/g)) elements[match[2]] = new Element(match[1]);
     elements['section-select'].value = 'all';
-    const context = {windowQuestions: data, Math, Set,
+    const context = {windowQuestions: data, Math, Set, URLSearchParams, location: {search},
         localStorage: {getItem: key => storage.get(key) ?? null, setItem: (key, value) => storage.set(key, value)},
         Option: class extends Element { constructor(text, value) { super('option'); this.textContent=text; this.value=value; } },
         document: {getElementById: id => elements[id], createElement: tag => new Element(tag),
@@ -36,6 +36,16 @@ function boot(data = database, storage = new Map(), size = 'custom') {
     if (size !== '20') elements[`size-${size}`].click();
     return elements;
 }
+
+test('section links select their topic without starting or replacing a session', () => {
+    const q=database.find(q=>q.section_id==='3.7');
+    const ui=boot(database,new Map(),'custom','?section=3.7');
+    assert.equal(ui['section-select'].value,q.section);
+    assert.ok(ui['start-screen'].classes.has('active'));
+    ui['btn-start'].click();
+    assert.equal(ui['question-section'].textContent,q.section);
+    assert.equal(boot(database,new Map(),'custom','?section=unknown')['section-select'].value,'all');
+});
 
 test('single-answer scoring locks repeated clicks and resets on restart', () => {
     const q = database[0], ui = boot([q]);

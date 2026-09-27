@@ -174,6 +174,11 @@ document.addEventListener('DOMContentLoaded', () => {
   for (const section of new Set(allQuestions.map((q) => q.section))) {
     $('section-select').add(new Option(section, section))
   }
+  if (typeof location !== 'undefined') {
+    const requestedSection = new URLSearchParams(location.search).get('section')
+    const match = allQuestions.find(q => q.section_id === requestedSection)
+    if (match) $('section-select').value = match.section
+  }
 
   function filteredQuestions() {
     return allQuestions.filter(

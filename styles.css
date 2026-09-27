@@ -293,6 +293,28 @@ summary { cursor: pointer; min-height: 40px; align-content: center; }
 .review-answer { line-height: 1.7; margin-bottom: 10px; }
 .review-body > a { display: inline-block; padding: 12px 0 0; min-height: 44px; }
 .connection-notice { margin: 0 0 16px; color: var(--muted); font-size: 12px; text-align: center; }
+.section-page { max-width: 960px; margin: auto; }
+.section-page nav { font-size: 13px; }
+.section-intro { margin: 32px 0; }
+.section-intro h1 { font-size: clamp(26px, 4vw, 42px); line-height: 1.2; letter-spacing: -.03em; margin: 12px 0 20px; }
+.section-page p { color: var(--muted); line-height: 1.8; margin: 12px 0; }
+.section-start { display: inline-flex; width: auto; margin-top: 12px; text-decoration: none; }
+.section-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,280px),1fr)); gap: 16px; }
+.section-tile { display: flex; flex-direction: column; gap: 16px; padding: 24px; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); text-decoration: none; }
+.section-tile h2 { color: var(--text); font-size: 19px; line-height: 1.5; }
+.section-tile > span:last-child { margin-top: auto; font-size: 13px; }
+.section-page section { margin-top: 36px; }
+.section-page section h2, .section-related h2 { font-size: 23px; }
+.section-topics { padding-left: 20px; line-height: 1.9; }
+.section-topics span { color: var(--muted); font-size: 13px; }
+.section-examples { list-style: none; padding: 0; display: grid; gap: 16px; }
+.section-examples > li { padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; }
+.section-examples h3 { font-size: 17px; line-height: 1.6; }
+.section-examples ul { list-style: none; padding: 0; }
+.section-examples ul li { margin-top: 12px; line-height: 1.7; font-size: 14px; }
+.section-related { display: flex; flex-wrap: wrap; gap: 12px 20px; margin-top: 36px; }
+.section-related h2 { flex-basis: 100%; }
+.section-page { overflow-wrap: anywhere; }
 .offline-card { grid-column: 1 / -1; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 28px; padding: 26px; border: 1px solid var(--border); border-radius: 20px; background: var(--surface); }
 .offline-intro h2 { margin: 10px 0; font-size: 23px; line-height: 1.35; letter-spacing: -.6px; }
 .offline-intro p { color: var(--muted); font-size: 14px; line-height: 1.7; }

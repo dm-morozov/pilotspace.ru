@@ -10,7 +10,10 @@ const files = new Set(['index.html', 'updates.html', 'styles.css', 'app.js', 'of
   'SOURCE_REVIEW.md', 'QUESTION_REVIEW.md']);
 for (const q of bank) for (const image of q.images || []) files.add(image.src);
 for (const icon of JSON.parse(fs.readFileSync(path.join(root, 'site.webmanifest'), 'utf8')).icons) files.add(icon.src);
-files.add('icons/icon-180.png');
+files.add('icons/icon-180-v2.png');
+if (fs.existsSync(path.join(root, 'sections'))) {
+  for (const file of fs.readdirSync(path.join(root, 'sections'))) if (file.endsWith('.html')) files.add('sections/' + file);
+}
 // Discover local HTML assets as well, so a future script cannot silently be omitted.
 for (const page of ['index.html', 'updates.html']) {
   const html = fs.readFileSync(path.join(root, page), 'utf8');
