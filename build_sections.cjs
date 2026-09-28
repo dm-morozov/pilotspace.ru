@@ -23,7 +23,7 @@ function page(title,description,url,body){return `<!DOCTYPE html>
 <meta name="twitter:image:alt" content="PilotSpace — тренажёр ЧЛЭ для пилотов. Бесплатно, без регистрации, с офлайн-тренировками.">
 <meta property="og:site_name" content="PilotSpace"><meta property="og:locale" content="ru_RU">
 <meta name="twitter:title" content="${escape(title)} — PilotSpace"><meta name="twitter:description" content="${escape(description)}">
-<link rel="icon" href="../favicon.svg" type="image/svg+xml"><link rel="manifest" href="../site.webmanifest"><link rel="apple-touch-icon" href="../icons/icon-180-v2.png"><script src="../theme.js?v=1"></script><link rel="stylesheet" href="../styles.css?v=16"></head>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml"><link rel="manifest" href="../site.webmanifest"><link rel="apple-touch-icon" href="../icons/icon-180-v2.png"><script src="../theme.js?v=1"></script><link rel="stylesheet" href="../styles.css?v=17"></head>
 <body><div id="app">${header}<main class="section-page">${body}</main><footer class="app-footer"><a href="../index.html">К тренировкам</a> · <a href="../updates.html">Обновления</a><p>Дмитрий Морозов · PilotSpace</p></footer></div></body></html>\n`;}
 const outputs={};
 for(const group of groups){

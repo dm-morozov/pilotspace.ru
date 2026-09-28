@@ -267,9 +267,12 @@ summary { cursor: pointer; min-height: 40px; align-content: center; }
 }
 /* Keep the wordmark and theme controls comfortable on narrow phones. */
 @media (max-width: 420px) {
-    .app-header { flex-wrap: wrap; row-gap: 16px; }
-    .brand { flex: 1 0 100%; }
-    .theme-switch { margin-left: auto; }
+    .app-header { flex-wrap: nowrap; gap: 8px; padding: 14px 0; }
+    .brand { flex: 1 1 auto; min-width: 0; gap: 7px; }
+    .brand-icon { width: 30px; height: 30px; border-radius: 9px; }
+    .brand-name { font-size: 17px; white-space: nowrap; }
+    .brand-name > span { display: none; }
+    .theme-switch { flex: 0 0 auto; margin-left: 0; }
     .theme-switch button { width: 44px; min-height: 44px; }
 }
 :root .brand-home { color: var(--text); text-decoration: none; }
