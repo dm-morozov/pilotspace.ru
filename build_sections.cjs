@@ -23,8 +23,8 @@ function page(title,description,url,body){return `<!DOCTYPE html>
 <meta name="twitter:image:alt" content="PilotSpace — тренажёр ЧЛЭ для пилотов. Бесплатно, без регистрации, с офлайн-тренировками.">
 <meta property="og:site_name" content="PilotSpace"><meta property="og:locale" content="ru_RU">
 <meta name="twitter:title" content="${escape(title)} — PilotSpace"><meta name="twitter:description" content="${escape(description)}">
-<link rel="icon" href="../favicon.svg" type="image/svg+xml"><link rel="manifest" href="../site.webmanifest"><link rel="apple-touch-icon" href="../icons/icon-180-v2.png"><script src="../theme.js?v=1"></script><link rel="stylesheet" href="../styles.css?v=17"></head>
-<body><div id="app">${header}<main class="section-page">${body}</main><footer class="app-footer"><a href="../index.html">К тренировкам</a> · <a href="../updates.html">Обновления</a><p>Дмитрий Морозов · PilotSpace</p></footer></div></body></html>\n`;}
+<link rel="icon" href="../favicon.svg" type="image/svg+xml"><link rel="manifest" href="../site.webmanifest"><link rel="apple-touch-icon" href="../icons/icon-180-v2.png"><script src="../theme.js?v=1"></script><link rel="stylesheet" href="../styles.css?v=23"></head>
+<body><div id="app">${header}<main class="section-page">${body}</main><footer class="app-footer"><a href="../index.html">К тренировкам</a> · <a href="../updates.html">Обновления</a> · <a href="../help.html">Помощь</a><p>Дмитрий Морозов · PilotSpace</p></footer></div></body></html>\n`;}
 const outputs={};
 for(const group of groups){
  const {questions,title,id,slug}=group;
@@ -41,7 +41,7 @@ for(const group of groups){
 }
 outputs['sections/index.html']=page('Разделы подготовки ЧЛЭ','Каталог тестов ЧЛЭ: Airbus, Boeing, аэродинамика, навигация, метеорология, CRM и правила полётов. Выберите тему подготовки.','sections/index.html',
  `<nav><a href="../index.html">← К тренировкам</a></nav><header class="section-intro"><span class="eyebrow">Выберите свою тему</span><h1>Разделы подготовки ЧЛЭ</h1><p>Посмотрите состав раздела и примеры вопросов, затем переходите к тренировке. Все ${bank.length} вопросов доступны бесплатно.</p></header><div class="section-grid">${groups.map(g=>`<a class="section-tile" href="${g.slug}.html"><span class="eyebrow">Раздел ${g.id} · ${g.questions.length} вопросов</span><h2>${escape(g.title)}</h2><span>Посмотреть раздел →</span></a>`).join('')}</div>`);
-outputs['sitemap.xml']='<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+['','updates.html',...Object.keys(outputs)].map(url=>`  <url><loc>https://pilotspace.ru/${url}</loc></url>`).join('\n')+'\n</urlset>\n';
+outputs['sitemap.xml']='<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+['','updates.html','help.html',...Object.keys(outputs)].map(url=>`  <url><loc>https://pilotspace.ru/${url}</loc></url>`).join('\n')+'\n</urlset>\n';
 for(const [file,content] of Object.entries(outputs)){
  const target=path.join(root,file);
  if(process.argv.includes('--check')) {if(!fs.existsSync(target)||fs.readFileSync(target,'utf8').replace(/\r\n/g,'\n')!==content)throw new Error(`Rebuild ${file}`);}

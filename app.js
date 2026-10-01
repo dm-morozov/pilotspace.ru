@@ -8,6 +8,28 @@ document.addEventListener('DOMContentLoaded', () => {
     score = 0,
     answered = false,
     selected = new Set()
+  const textSizes = ['compact', 'normal', 'large']
+  const textSizeKey = 'pilotspace-text-size'
+  let textSize = 'normal'
+  try {
+    const stored = localStorage.getItem(textSizeKey)
+    if (textSizes.includes(stored)) textSize = stored
+  } catch {}
+  function applyTextSize() {
+    $('app').dataset.textSize = textSize
+    for (const area of ['settings', 'quiz']) for (const size of textSizes) {
+      $('text-' + area + '-' + size).setAttribute('aria-pressed', String(size === textSize))
+    }
+  }
+  for (const area of ['settings', 'quiz']) for (const size of textSizes) {
+    $('text-' + area + '-' + size).addEventListener('click', () => {
+      textSize = size
+      applyTextSize()
+      try { localStorage.setItem(textSizeKey, textSize) }
+      catch { $('text-size-status').textContent = 'Размер изменён. Браузер не разрешил сохранить настройку после закрытия страницы.' }
+    })
+  }
+  applyTextSize()
   let practiceSize = '20'
   const shortPractice = () => practiceSize !== 'custom'
 
@@ -34,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   const storageKey = 'chle-progress-v1'
   const byId = new Map(allQuestions.map(q => [q.uid, q]))
-  let saved = null, mistakes = new Set(), results = []
+  let saved = null, mistakes = new Set(), results = [], history = [], favorites = new Set()
   // A changed question bank must never silently reuse old answers or scores.
   let revision = 2166136261
   for (const char of JSON.stringify(allQuestions)) {
@@ -42,9 +64,37 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   function persist() {
     try {
-      localStorage.setItem(storageKey, JSON.stringify({ version: 1, revision, saved, mistakes: [...mistakes] }))
+      localStorage.setItem(storageKey, JSON.stringify({ version: 1, revision, saved, mistakes: [...mistakes], history, favorites: [...favorites] }))
     } catch {
       $('storage-notice').textContent = 'Браузер не разрешил сохранение. Можно продолжать тренировку, но после закрытия страницы прогресс может потеряться.'
+    }
+  }
+  const historyLimit = 20
+  function validHistory(items) {
+    return Array.isArray(items) && items.length <= historyLimit && items.every(h =>
+      h && typeof h.date === 'string' && Number.isFinite(Date.parse(h.date)) &&
+      Array.isArray(h.ids) && h.ids.length > 0 && h.ids.length <= byId.size &&
+      new Set(h.ids).size === h.ids.length && h.ids.every(id => byId.get(id)?.status === 'verified') &&
+      Array.isArray(h.results) && h.results.length === h.ids.length && h.results.every(r => typeof r === 'boolean'))
+  }
+  function renderHistory() {
+    $('history-list').replaceChildren()
+    $('history-count').textContent = history.length
+    $('history-empty').hidden = history.length > 0
+    for (const record of history) {
+      const item = document.createElement('li'), button = document.createElement('button')
+      const title = document.createElement('strong'), meta = document.createElement('span')
+      const topics = [...new Set(record.ids.map(id => byId.get(id).section))]
+      title.textContent = topics.length === 1 ? topics[0] : 'Разные разделы'
+      const correct = record.results.filter(Boolean).length
+      meta.textContent = new Date(record.date).toLocaleString('ru-RU', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) + ' · ' + correct + ' из ' + record.ids.length + ' верно · Разбор →'
+      button.type = 'button'; button.className = 'history-attempt'; button.append(title, meta)
+      button.addEventListener('click', () => {
+        questions = record.ids.map(id => byId.get(id)); results = [...record.results]
+        score = results.filter(Boolean).length; index = questions.length; answered = false
+        showResult()
+      })
+      item.append(button); $('history-list').append(item)
     }
   }
   function validSession(s) {
@@ -71,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
     $('import-preview').hidden = true
   }
   $('btn-export-progress').addEventListener('click', () => {
-    const data = { app: 'PilotSpace', version: 1, revision, saved, mistakes: [...mistakes] }
+    const data = { app: 'PilotSpace', version: 1, revision, saved, mistakes: [...mistakes], history, favorites: [...favorites] }
     const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }))
     const link = document.createElement('a')
     link.href = url
@@ -99,8 +149,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if ((data.saved !== null && !validSession(data.saved)) || !Array.isArray(data.mistakes) ||
           data.mistakes.length > byId.size || new Set(data.mistakes).size !== data.mistakes.length ||
           !data.mistakes.every(id => byId.get(id)?.status === 'verified')) throw new Error('Данные сохранения повреждены. Текущий прогресс не изменён.')
-      pendingImport = { version: 1, revision, saved: data.saved, mistakes: data.mistakes }
-      $('import-summary').textContent = `В файле: ${data.saved ? `тренировка, вопрос ${data.saved.index + 1} из ${data.saved.ids.length}` : 'нет незавершённой тренировки'}; вопросов на повторение: ${data.mistakes.length}.`
+      if (data.history !== undefined && !validHistory(data.history)) throw new Error('История тренировок в файле повреждена.')
+      if (data.favorites !== undefined && (!Array.isArray(data.favorites) || new Set(data.favorites).size !== data.favorites.length || !data.favorites.every(id => byId.get(id)?.status === 'verified'))) throw new Error('Избранные вопросы в файле повреждены.')
+      pendingImport = { version: 1, revision, saved: data.saved, mistakes: data.mistakes, history: data.history || [], favorites: data.favorites || [] }
+      $('import-summary').textContent = `В файле: ${data.saved ? `тренировка, вопрос ${data.saved.index + 1} из ${data.saved.ids.length}` : 'нет незавершённой тренировки'}; вопросов на повторение: ${data.mistakes.length}; завершённых тренировок: ${pendingImport.history.length}; избранных вопросов: ${pendingImport.favorites.length}.`
       $('import-preview').hidden = false
     } catch (error) {
       if (request === importRequest) $('transfer-status').textContent = error instanceof SyntaxError ? 'Не удалось прочитать JSON. Выберите файл сохранения PilotSpace.' : error.message
@@ -118,11 +170,35 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     saved = pendingImport.saved
     mistakes = new Set(pendingImport.mistakes)
+    history = pendingImport.history
+    favorites = new Set(pendingImport.favorites)
     clearImport()
     refreshProgress()
     $('transfer-status').textContent = 'Прогресс восстановлен. Можно продолжить тренировку или повторить ошибки.'
   })
+  function renderFavorites() {
+    $('favorite-count').textContent = favorites.size
+    $('btn-favorites').disabled = favorites.size === 0
+    $('favorite-empty').hidden = favorites.size > 0
+    $('favorite-list').replaceChildren()
+    for (const id of favorites) {
+      const q = byId.get(id), item = document.createElement('li')
+      const title = document.createElement('p'), remove = document.createElement('button')
+      title.textContent = q.id + '. ' + q.question
+      remove.type = 'button'; remove.className = 'text-button'; remove.textContent = 'Убрать'
+      remove.setAttribute('aria-label', 'Убрать из избранного: ' + q.question)
+      remove.addEventListener('click', () => { favorites.delete(id); persist(); renderFavorites() })
+      item.append(title, remove); $('favorite-list').append(item)
+    }
+  }
+  function favoriteButton() {
+    const marked = favorites.has(questions[index]?.uid)
+    $('btn-favorite').textContent = marked ? '★ В избранном' : '☆ В избранное'
+    $('btn-favorite').setAttribute('aria-pressed', String(marked))
+  }
   function refreshProgress() {
+    renderHistory()
+    renderFavorites()
     $('resume-panel').hidden = !saved
     $('resume-description').textContent = saved ? `Тренировка · вопрос ${saved.index + 1} из ${saved.ids.length} · отвечено: ${saved.results.filter(r => r !== null).length}` : ''
     $('replace-notice').hidden = !saved
@@ -163,6 +239,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (raw) {
       const state = JSON.parse(raw)
       if (state.version === 1 && state.revision === revision) {
+        if (validHistory(state.history)) history = state.history
+        favorites = new Set(Array.isArray(state.favorites) ? state.favorites.filter(id => byId.get(id)?.status === 'verified') : [])
         mistakes = new Set(Array.isArray(state.mistakes) ? state.mistakes.filter(id => byId.get(id)?.status === 'verified') : [])
         if (validSession(state.saved)) saved = state.saved
         else if (state.saved) $('storage-notice').textContent = 'Сохранённая тренировка повреждена. Начните новую; список ошибок сохранён.'
@@ -179,6 +257,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const match = allQuestions.find(q => q.section_id === requestedSection)
     if (match) $('section-select').value = match.section
   }
+
+  const searchSections = [...new Set(allQuestions.filter(q => q.status === 'verified').map(q => q.section))]
+  const normalizeTopic = text => text.toLowerCase().replaceAll('ё', 'е').replace(/[aа](?=\d)/g, '').replaceAll('эйрбас', 'airbus').replaceAll('боинг', 'boeing')
+  function searchTopics() {
+    const query = normalizeTopic($('topic-search').value.trim())
+    $('topic-search-clear').hidden = !query
+    $('topic-search-results').replaceChildren()
+    $('topic-search-results').hidden = !query
+    if (!query) { $('topic-search-status').textContent = ''; return }
+    const matches = searchSections.filter(section => query.split(/\s+/).every(word => normalizeTopic(section).includes(word)))
+    $('topic-search-status').textContent = matches.length ? 'Найдено разделов: ' + matches.length : 'Ничего не найдено. Попробуйте название темы или самолёта.'
+    for (const section of matches) {
+      const item = document.createElement('li'), button = document.createElement('button')
+      const title = document.createElement('strong'), count = document.createElement('span')
+      title.textContent = section
+      count.textContent = allQuestions.filter(q => q.status === 'verified' && q.section === section).length + ' вопросов · Выбрать →'
+      button.type = 'button'; button.className = 'topic-match'; button.append(title, count)
+      button.addEventListener('click', () => {
+        $('section-select').value = section
+        updateSubsections()
+        $('topic-search').value = ''; searchTopics()
+        $('topic-search-status').textContent = 'Выбран раздел: ' + section
+        $('section-select').focus?.()
+      })
+      item.append(button); $('topic-search-results').append(item)
+    }
+  }
+  $('topic-search').addEventListener('input', searchTopics)
+  $('topic-search-clear').addEventListener('click', () => { $('topic-search').value = ''; searchTopics(); $('topic-search').focus?.() })
 
   function filteredQuestions() {
     return allQuestions.filter(
@@ -225,21 +332,21 @@ document.addEventListener('DOMContentLoaded', () => {
     updateRanges()
   }
 
-  function startQuiz(onlyMistakes = false) {
-    questions = onlyMistakes ? [...mistakes].map(id => byId.get(id)) : filteredQuestions()
+  function startQuiz(onlyMistakes = false, onlyFavorites = false) {
+    questions = onlyFavorites ? [...favorites].map(id => byId.get(id)) : onlyMistakes ? [...mistakes].map(id => byId.get(id)) : filteredQuestions()
     const range = $('range-select').value
-    if (!onlyMistakes && !shortPractice() && range !== 'all') {
+    if (!onlyMistakes && !onlyFavorites && !shortPractice() && range !== 'all') {
       const [start, end] = range.split('-').map(Number)
       questions = questions.slice(start, end)
     }
     if (!questions.length) return
-    if ((!onlyMistakes && shortPractice()) || $('random-checkbox').checked) {
+    if ((!onlyMistakes && !onlyFavorites && shortPractice()) || $('random-checkbox').checked) {
       for (let i = questions.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1))
         ;[questions[i], questions[j]] = [questions[j], questions[i]]
       }
     }
-    if (!onlyMistakes && shortPractice()) questions = questions.slice(0, Number(practiceSize))
+    if (!onlyMistakes && !onlyFavorites && shortPractice()) questions = questions.slice(0, Number(practiceSize))
     index = score = 0
     results = questions.map(() => null)
     $('score').textContent = '0'
@@ -295,6 +402,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .filter(Boolean)
       .join(' · ')
     $('question-text').textContent = `${q.id}. ${q.question}`
+    favoriteButton()
     const report = `Здравствуйте, Дмитрий!\n\nХочу сообщить об ошибке в PilotSpace.\nВопрос: ${q.uid}\nРаздел: ${q.section}\nСтраницы PDF: ${q.source_pages.join(', ')}\n${q.question.slice(0, 600)}\n\nЧто нужно исправить:\n`
     $('report-question').href = `mailto:dem.morozov@gmail.com?subject=${encodeURIComponent(`PilotSpace: вопрос ${q.uid}`)}&body=${encodeURIComponent(report)}`
     $('question-source').replaceChildren(
@@ -448,15 +556,21 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function nextQuestion() {
-    if (!answered) return
+    if (!answered || index >= questions.length) return
     index++
     if (index < questions.length) {
       loadQuestion()
       saveSession()
       return
     }
+    history.unshift({date: new Date().toISOString(), ids: questions.map(q => q.uid), results: [...results]})
+    history = history.slice(0, historyLimit)
     saved = null
     persist()
+    showResult()
+  }
+
+  function showResult() {
     $('progress-bar-fill').style.width = '100%'
     $('final-score-value').textContent = score
     $('final-score-total').textContent = questions.length
@@ -482,6 +596,13 @@ document.addEventListener('DOMContentLoaded', () => {
       updatePracticeSize()
     })
   }
+  $('btn-favorite').addEventListener('click', () => {
+    const q = questions[index]
+    if (!q) return
+    if (favorites.has(q.uid)) favorites.delete(q.uid); else favorites.add(q.uid)
+    persist(); favoriteButton()
+  })
+  $('btn-favorites').addEventListener('click', () => startQuiz(false, true))
   $('btn-start').addEventListener('click', () => startQuiz())
   $('btn-resume').addEventListener('click', resumeQuiz)
   $('btn-mistakes').addEventListener('click', () => startQuiz(true))

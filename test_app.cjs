@@ -329,3 +329,64 @@ test('question report includes its stable id and PDF pages', () => {
     assert.ok(report.includes(q.uid));
     assert.ok(report.includes('Страницы PDF: '+q.source_pages.join(', ')));
 });
+
+
+test('history survives reload and reviewing it preserves an unfinished session', () => {
+    const q=database[0], storage=new Map(); let ui=boot([q],storage);
+    ui['btn-start'].click(); choose(ui,q.correct_answers[0]); ui['btn-next'].click();
+    ui['btn-next'].click();
+    assert.equal(JSON.parse(storage.get('chle-progress-v1')).history.length,1);
+    ui=boot([q],storage); assert.equal(ui['history-list'].children.length,1);
+    ui['btn-start'].click(); ui['btn-home'].click();
+    const before=storage.get('chle-progress-v1');
+    ui['history-list'].children[0].children[0].click();
+    assert.equal(Number(ui['final-score-value'].textContent),1);
+    ui['review-all'].click(); assert.equal(ui['review-list'].children.length,1);
+    assert.equal(storage.get('chle-progress-v1'),before);
+    ui['btn-restart'].click(); ui['btn-resume'].click(); assert.equal(ui['btn-next'].disabled,true);
+});
+test('history retains twenty attempts and imports atomically; corrupt history is rejected', async () => {
+    const q=database[0], storage=new Map(), ui=boot([q],storage);
+    for(let i=0;i<22;i++){ui['btn-start'].click();choose(ui,q.correct_answers[0]);ui['btn-next'].click();ui['btn-restart'].click();}
+    const data={app:'PilotSpace',...JSON.parse(storage.get('chle-progress-v1'))};
+    assert.equal(data.history.length,20);
+    const targetStorage=new Map(), target=boot([q],targetStorage);
+    await importFile(target,data); assert.equal(targetStorage.size,0);
+    target['btn-confirm-import'].click();assert.equal(target['history-list'].children.length,20);
+    const before=targetStorage.get('chle-progress-v1');
+    await importFile(target,{...data,history:[{...data.history[0],results:[null]}]});
+    assert(target['import-preview'].hidden); assert.equal(targetStorage.get('chle-progress-v1'),before);
+});
+
+test('topic search chooses the section without starting or replacing a saved attempt', () => {
+ const storage=new Map(), ui=boot(database,storage); ui['btn-start'].click(); ui['btn-home'].click(); const before=storage.get('chle-progress-v1');
+ ui['topic-search'].value='А320'; ui['topic-search'].listeners.input();
+ assert(ui['topic-search-results'].children.length>0);
+ const first=ui['topic-search-results'].children[0].children[0]; const title=first.children[0].textContent;
+ first.click(); assert.equal(ui['section-select'].value,title); assert.equal(storage.get('chle-progress-v1'),before); assert(ui['start-screen'].classes.has('active')); assert(ui['topic-search-results'].hidden);
+ ui['topic-search'].value='несуществующая тема'; ui['topic-search'].listeners.input(); assert.equal(ui['topic-search-results'].children.length,0); assert.match(ui['topic-search-status'].textContent,/Ничего не найдено/);
+ ui['topic-search-clear'].click(); assert.equal(ui['topic-search'].value,''); assert(ui['topic-search-results'].hidden);
+});
+
+test('favorites survive reload and train independently without changing an active question', () => {
+ const q=database[0], other=database.find(q=>q.section!==database[0].section), storage=new Map(); let ui=boot([q,other],storage);
+ ui['btn-start'].click(); const text=ui['question-text'].textContent; ui['btn-favorite'].click(); assert.equal(ui['question-text'].textContent,text); assert.equal(ui['btn-next'].disabled,true); assert.equal(ui['btn-favorite'].attributes['aria-pressed'],'true');
+ ui=boot([q,other],storage); assert.equal(ui['favorite-count'].textContent,1); ui['section-select'].change(other.section); ui['btn-favorites'].click(); assert.match(ui['question-text'].textContent,new RegExp(q.question.slice(0,10).replace(/[.*+?^$()|[\]\\]/g,'\\$&'))); ui['btn-favorite'].click(); ui['btn-home'].click(); assert.equal(ui['favorite-count'].textContent,0); assert(ui['btn-favorites'].disabled);
+});
+test('favorite import validates ids and supports older files without favorites', async () => {
+ const {q,data}=exportedFixture(), storage=new Map(), ui=boot([q],storage);
+ await importFile(ui,{...data,favorites:[q.uid]}); ui['btn-confirm-import'].click(); assert.equal(ui['favorite-count'].textContent,1);
+ const before=storage.get('chle-progress-v1'); await importFile(ui,{...data,favorites:['unknown']}); assert(ui['import-preview'].hidden); assert.equal(storage.get('chle-progress-v1'),before);
+ delete data.favorites; await importFile(ui,data); ui['btn-confirm-import'].click(); assert.equal(ui['favorite-count'].textContent,0);
+});
+
+test('reading size syncs both controls and survives reload without changing training',()=>{
+ const q=database[0], storage=new Map(); let ui=boot([q],storage); assert.equal(ui.app.dataset.textSize,'normal');
+ ui['btn-start'].click(); choose(ui,q.correct_answers[0]); const before=storage.get('chle-progress-v1');
+ ui['text-quiz-large'].click(); assert.equal(ui.app.dataset.textSize,'large'); assert.equal(ui['text-settings-large'].attributes['aria-pressed'],'true'); assert.equal(ui['text-quiz-normal'].attributes['aria-pressed'],'false'); assert.equal(storage.get('chle-progress-v1'),before); assert.equal(Number(ui.score.textContent),1);
+ ui=boot([q],storage); assert.equal(ui.app.dataset.textSize,'large'); ui['text-settings-compact'].click(); assert.equal(ui['text-quiz-compact'].attributes['aria-pressed'],'true');
+ storage.set('pilotspace-text-size','unknown'); assert.equal(boot([q],storage).app.dataset.textSize,'normal');
+});
+test('blocked preference storage still changes text without interrupting training',()=>{
+ const q=database[0], ui=boot([q],{get(){throw Error('blocked')},set(){throw Error('blocked')}}); ui['btn-start'].click(); ui['text-quiz-large'].click(); assert.equal(ui.app.dataset.textSize,'large'); assert.match(ui['text-size-status'].textContent,/не разрешил/);choose(ui,q.correct_answers[0]);ui['btn-next'].click();assert.equal(Number(ui['final-score-value'].textContent),1);
+});

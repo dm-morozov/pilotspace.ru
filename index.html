@@ -54,7 +54,7 @@
     }
     </script>
     <script src="theme.js?v=1"></script>
-    <link rel="stylesheet" href="styles.css?v=17">
+    <link rel="stylesheet" href="styles.css?v=23">
 </head>
 <body>
     <div id="app">
@@ -85,7 +85,7 @@
                 <h1>К следующему <br>полёту&nbsp;—<br><span>с уверенностью.</span></h1>
                 <p class="intro-description">PilotSpace — тренажёр ЧЛЭ для подготовки к проверке знаний. Выберите тему, пройдите короткую тренировку и повторите ошибки.</p>
                 <a class="release-link" href="sections/index.html">Все разделы подготовки →</a>
-                <a class="release-link" href="updates.html#v1-3-0"><span>Что нового</span> Версия 1.3.0 <span aria-hidden="true">↗</span></a>
+                <a class="release-link" href="updates.html#v1-4-0"><span>Что нового</span> Версия 1.4.0 <span aria-hidden="true">↗</span></a>
                 <div class="intro-stats">
                     <div><strong id="total-questions">—</strong><span>вопросов для практики</span></div>
                     <div><strong>Без оплаты</strong><span>и регистрации</span></div>
@@ -109,8 +109,28 @@
                     <details class="mistake-details"><summary>Посмотреть список вопросов</summary><ul id="mistake-list"></ul></details>
                     <button id="btn-mistakes" class="btn secondary" type="button" disabled>Повторить ошибки</button>
                 </section>
+                <details class="favorites-panel">
+                    <summary>Избранные вопросы <span id="favorite-count">0</span></summary>
+                    <p>Отмечайте вопросы звёздочкой во время тренировки. Здесь — ваша подборка для повторения, независимо от выбранного раздела.</p>
+                    <p id="favorite-empty">В избранном пока пусто.</p>
+                    <ul id="favorite-list"></ul>
+                    <button id="btn-favorites" class="btn secondary" type="button" disabled>Тренироваться по избранному</button>
+                    <p>Запуск подборки заменит незавершённую тренировку. При необходимости сохраните прогресс в файл.</p>
+                </details>
+                <details class="history-panel">
+                    <summary>История тренировок <span id="history-count">0</span></summary>
+                    <p>Последние 20 завершённых попыток в этом браузере. Откройте результат, чтобы разобрать ошибки. Новые результаты появятся после завершения тренировки.</p>
+                    <p id="history-empty">Пока нет завершённых тренировок.</p>
+                    <ol id="history-list"></ol>
+                </details>
                 <div class="settings-heading"><span class="eyebrow">Новая тренировка</span><h2>Что повторим сегодня?</h2><p>Выберите тему и удобный объём вопросов.</p></div>
                 <div class="form-group">
+                    <div class="topic-search">
+                        <label for="topic-search">Найти раздел</label>
+                        <div class="topic-search-field"><input id="topic-search" type="search" placeholder="Например, A320 или метеорология" autocomplete="off" aria-describedby="topic-search-status"><button id="topic-search-clear" class="text-button" type="button" hidden>Очистить</button></div>
+                        <p id="topic-search-status" class="selection-caption" role="status" aria-live="polite"></p>
+                        <ul id="topic-search-results" hidden></ul>
+                    </div>
                     <label for="section-select">Раздел подготовки</label>
                     <select id="section-select">
                         <option value="all">Все разделы</option>
@@ -121,6 +141,16 @@
                     <label for="subsection-select" id="subsection-label">Система самолёта</label>
                     <select id="subsection-select"><option value="all">Все подразделы</option></select>
                 </div>
+                <details class="reading-settings">
+                    <summary>Размер текста вопросов</summary>
+                    <div class="text-size-choices" role="group" aria-label="Размер текста вопросов">
+<button id="text-settings-compact" type="button" aria-pressed="false">Компактный</button>
+<button id="text-settings-normal" type="button" aria-pressed="true">Обычный</button>
+<button id="text-settings-large" type="button" aria-pressed="false">Крупный</button>
+</div>
+                    <p class="reading-preview">Так будут выглядеть варианты ответов. Выберите удобный размер — настройка применяется и к разбору.</p>
+                    <p id="text-size-status" class="selection-caption" role="status" aria-live="polite"></p>
+                </details>
                 <div id="practice-size-group" class="form-group">
                     <span id="practice-size-label" class="field-label">Сколько вопросов пройдём?</span>
                     <div class="practice-sizes" role="group" aria-labelledby="practice-size-label" aria-describedby="practice-summary">
@@ -149,7 +179,7 @@
                     <input id="progress-file" type="file" accept=".json,application/json" hidden>
                     <div id="import-preview" hidden>
                         <p id="import-summary"></p>
-                        <p>Текущая тренировка и список ошибок будут заменены. При необходимости сначала скачайте своё сохранение.</p>
+                        <p>Текущая тренировка, список ошибок, избранное и история будут заменены. При необходимости сначала скачайте своё сохранение.</p>
                         <div class="transfer-actions"><button id="btn-confirm-import" class="btn primary" type="button">Заменить прогресс</button><button id="btn-cancel-import" class="btn secondary" type="button">Отмена</button></div>
                     </div>
                     <p id="transfer-status" role="status" aria-live="polite"></p>
@@ -200,7 +230,12 @@
             </div>
             
             <div class="question-container">
-                <div id="question-section" class="section-tag">Раздел</div>
+                <div class="question-heading"><div id="question-section" class="section-tag">Раздел</div><button id="btn-favorite" class="text-button favorite-toggle" type="button" aria-pressed="false">☆ В избранное</button></div>
+                <details class="reading-settings reading-settings-quiz"><summary>Размер текста</summary><div class="text-size-choices" role="group" aria-label="Размер текста вопросов">
+<button id="text-quiz-compact" type="button" aria-pressed="false">Компактный</button>
+<button id="text-quiz-normal" type="button" aria-pressed="true">Обычный</button>
+<button id="text-quiz-large" type="button" aria-pressed="false">Крупный</button>
+</div></details>
                 <h2 id="question-text" tabindex="-1">Текст вопроса</h2>
                 <div id="question-images"></div>
                 <p id="answer-help"></p>
@@ -305,9 +340,9 @@
                 <a href="https://t.me/dem2014" target="_blank" rel="noopener noreferrer"><span>Telegram ↗</span>@dem2014</a>
             </div>
         </div>
-        <div class="footer-bottom"><span>PilotSpace · Учиться с комфортом</span><a href="updates.html">История обновлений · 1.3.0</a><span>Бесплатно. Для тех, кто в небе.</span></div>
+        <div class="footer-bottom"><span>PilotSpace · Учиться с комфортом</span><a href="help.html">Помощь</a><a href="updates.html">История обновлений · 1.4.0</a><span>Бесплатно. Для тех, кто в небе.</span></div>
     </footer>
-    <script src="app.js?v=10"></script>
+    <script src="app.js?v=14"></script>
     <script src="support.js?v=2"></script>
     <script src="install.js?v=1"></script>
     <script src="offline.js?v=2"></script>

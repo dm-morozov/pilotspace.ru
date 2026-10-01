@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" href="icons/icon-180-v2.png">
     <link rel="manifest" href="site.webmanifest">
     <script src="theme.js?v=1"></script>
-    <link rel="stylesheet" href="styles.css?v=17">
+    <link rel="stylesheet" href="styles.css?v=23">
 </head>
 <body class="updates-page">
     <div id="app">
@@ -50,9 +50,37 @@
                 <p>Здесь — важные изменения в тренажёре и следующие шаги. Чтобы вы знали, что стало удобнее и куда движется проект.</p>
             </section>
             <div class="updates-layout">
+                <aside class="updates-aside" aria-label="Планы и поддержка">
+                    <section class="updates-note">
+                        <span class="eyebrow">Следующий шаг</span>
+                        <h2>Видимость в поиске</h2>
+                        <p>Дальше хочу подключить инструменты Google и Яндекса, проверить индексацию страниц и понять, по каким запросам люди находят тренажёр.</p>
+                        <div class="updates-later"><h3>На горизонте</h3><p>Личный кабинет, синхронизация между устройствами и доска идей с голосованием.</p></div>
+                        <p class="updates-fine-print">Это планы, а не готовые функции. Порядок может меняться: сначала исправляю ошибки и улучшаю подготовку.</p>
+                    </section>
+                    <section class="updates-note updates-thanks">
+                        <span class="eyebrow">С вашей поддержкой</span>
+                        <h2>Ваше участие важно</h2>
+                        <p>Меня зовут Дмитрий Морозов. Я один развиваю PilotSpace в свободное время. Ваши идеи, сообщения об ошибках и донаты помогают двигаться дальше.</p>
+                        <p>Чашка кофе для вас — поддержка и мотивация для меня. Тренажёр остаётся бесплатным для всех.</p>
+                        <a class="updates-action" href="index.html#support-section">Поддержать проект <span aria-hidden="true">↗</span></a>
+                        <a class="updates-contact" href="https://t.me/dem2014" target="_blank" rel="noopener noreferrer">Предложить идею в Telegram ↗</a>
+                        <span class="updates-signature">Дмитрий Морозов · автор PilotSpace</span>
+                    </section>
+                </aside>
                 <section aria-labelledby="timeline-title">
                     <h2 class="updates-section-title" id="timeline-title">История обновлений</h2>
                     <ol class="release-timeline">
+                        <li class="release-entry" id="v1-4-0">
+                            <div class="release-meta"><time datetime="2026-10-01">1 октября 2026</time><span class="release-badge">Версия 1.4.0</span></div>
+                            <h3>История тренировок и своя подборка</h3>
+                            <p>Добавил историю последних 20 завершённых тренировок: дата, тема, результат и разбор ошибок. История сохраняется в браузере, работает офлайн и переносится вместе с файлом прогресса. Попытки, завершённые до этого обновления, восстановить нельзя. При изменении базы история сбрасывается вместе с прежним прогрессом.</p>
+                            <p>Добавил избранные вопросы: отмечайте их звёздочкой и проходите тренировку по своей подборке. Избранное сохраняется офлайн и переносится в файле прогресса.</p>
+                            <p>Добавил поиск по названиям разделов: введите тему или модель самолёта и выберите совпадение. Поиск работает без интернета.</p>
+                            <p>Добавил три размера текста вопросов и ответов: компактный, обычный и крупный. Настройка сохраняется в браузере, действует в разборе и меняется прямо во время тренировки.</p>
+                            <p>Собрал <a href="help.html">страницу помощи</a>: установка, офлайн-режим, обновления, история, избранное и перенос прогресса. Инструкции доступны и без сети.</p>
+                            <p>Сделал поля выбора раздела и системы компактнее на телефоне. На странице обновлений поднял планы и поддержку над историей выпусков, чтобы они всегда были заметны.</p>
+                        </li>
                         <li class="release-entry" id="v1-3-0">
                             <div class="release-meta"><time datetime="2026-09-27">27 сентября 2026</time><span class="release-badge">Версия 1.3.0</span></div>
                             <h3>PilotSpace на главном экране</h3>
@@ -119,27 +147,10 @@
                         </li>
                     </ol>
                 </section>
-                <aside class="updates-aside" aria-label="Планы и поддержка">
-                    <section class="updates-note">
-                        <span class="eyebrow">Следующий шаг</span>
-                        <h2>История тренировок</h2>
-                        <p>Дальше хочу сохранять результаты завершённых попыток, чтобы можно было возвращаться к ним и видеть свой прогресс.</p>
-                        <div class="updates-later"><h3>На горизонте</h3><p>Личный кабинет, синхронизация между устройствами и доска идей с голосованием.</p></div>
-                        <p class="updates-fine-print">Это планы, а не готовые функции. Порядок может меняться: сначала исправляю ошибки и улучшаю подготовку.</p>
-                    </section>
-                    <section class="updates-note updates-thanks">
-                        <span class="eyebrow">С вашей поддержкой</span>
-                        <h2>Ваше участие важно</h2>
-                        <p>Меня зовут Дмитрий Морозов. Я один развиваю PilotSpace в свободное время. Ваши идеи, сообщения об ошибках и донаты помогают двигаться дальше.</p>
-                        <p>Чашка кофе для вас — поддержка и мотивация для меня. Тренажёр остаётся бесплатным для всех.</p>
-                        <a class="updates-action" href="index.html#support-section">Поддержать проект <span aria-hidden="true">↗</span></a>
-                        <a class="updates-contact" href="https://t.me/dem2014" target="_blank" rel="noopener noreferrer">Предложить идею в Telegram ↗</a>
-                        <span class="updates-signature">Дмитрий Морозов · автор PilotSpace</span>
-                    </section>
-                </aside>
+
             </div>
         </main>
     </div>
-    <footer class="app-footer"><div class="footer-bottom"><span>PilotSpace · Учиться с комфортом</span><a href="index.html">Вернуться к тренировкам →</a></div></footer>
+    <footer class="app-footer"><div class="footer-bottom"><span>PilotSpace · Учиться с комфортом</span><a href="help.html">Помощь</a><a href="index.html">Вернуться к тренировкам →</a></div></footer>
 </body>
 </html>

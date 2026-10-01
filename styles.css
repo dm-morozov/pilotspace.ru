@@ -395,3 +395,85 @@ summary { cursor: pointer; min-height: 40px; align-content: center; }
 .install-offer p, .install-caption, #install-help p { font-size: .875rem; line-height: 1.5; margin: .5rem 0; }
 .install-offer .text-button { flex-shrink: 0; min-height: 44px; }
 .install-caption { color: var(--text-muted); }
+
+/* Compact topic selectors with a consistent arrow in both themes. */
+.form-group select {
+    appearance: none;
+    -webkit-appearance: none;
+    height: auto;
+    min-height: 48px;
+    padding: 12px 42px 12px 14px;
+    font-weight: 400;
+    line-height: 1.4;
+    background-color: var(--surface-soft);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='m5 7 5 5 5-5' fill='none' stroke='%2378889b' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 20px;
+}
+.form-group select:focus-visible { border-color: var(--accent); }
+.form-group select:disabled { opacity: .65; cursor: not-allowed; }
+@media (max-width: 700px) {
+    .form-group select { font-size: 14px; border-radius: 12px; }
+}
+@supports (-webkit-touch-callout: none) {
+    .form-group select { font-size: 16px; }
+}
+@media (forced-colors: active) {
+    .form-group select { appearance: auto; background-image: none; }
+}
+
+.history-panel { border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 24px; }
+.history-panel summary { font-size: 14px; font-weight: 600; }
+.history-panel p { font-size: 12px; color: var(--muted); line-height: 1.6; margin: 10px 0; }
+#history-list { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 8px; max-height: 380px; overflow-y: auto; }
+.history-attempt { width: 100%; text-align: left; border: 1px solid var(--border); border-radius: 10px; padding: 12px; background: var(--surface-soft); color: var(--text); }
+.history-attempt strong { display: block; font-size: 13px; font-weight: 500; line-height: 1.5; }
+.history-attempt span { display: block; font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+.updates-layout { grid-template-columns: minmax(0, 1fr); gap: 36px; }
+.updates-aside { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 560px) { .updates-aside { grid-template-columns: minmax(0, 1fr); } }
+
+.topic-search { margin-bottom: 18px; }
+.topic-search-field { display: flex; align-items: center; gap: 8px; }
+.topic-search-field input { width: 100%; min-width: 0; min-height: 48px; padding: 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-soft); color: var(--text); font-size: 16px; }
+.topic-search-field input::placeholder { color: var(--muted); opacity: 1; font-size: 13px; }
+.topic-search-field button { flex-shrink: 0; min-height: 44px; font-size: 12px; }
+#topic-search-results { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 8px; max-height: 320px; overflow-y: auto; }
+.topic-match { display: block; width: 100%; text-align: left; padding: 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--text); }
+.topic-match strong { display: block; font-size: 13px; font-weight: 500; line-height: 1.5; overflow-wrap: anywhere; }
+.topic-match span { display: block; margin-top: 5px; color: var(--accent); font-size: 12px; }
+
+.favorites-panel { border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 16px; }
+.favorites-panel summary { font-size: 14px; font-weight: 600; }
+.favorites-panel > p { font-size: 12px; color: var(--muted); line-height: 1.6; margin: 10px 0; }
+#favorite-list { list-style: none; padding: 0; margin: 12px 0; max-height: 320px; overflow-y: auto; }
+#favorite-list li { padding: 10px 0; border-bottom: 1px solid var(--border); }
+#favorite-list p { font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
+#favorite-list button { min-height: 44px; font-size: 12px; }
+.question-heading { display: flex; align-items: flex-start; flex-wrap: wrap; gap: 8px 16px; margin-bottom: 12px; }
+.question-heading .section-tag { flex: 1 1 200px; margin-bottom: 0; }
+.favorite-toggle { flex: 0 0 auto; font-size: 13px; min-height: 44px; }
+.favorite-toggle[aria-pressed="true"] { color: var(--accent); }
+
+/* Reading preferences affect learning content, keeping navigation stable. */
+.reading-settings { margin-bottom: 20px; }
+.reading-settings summary { font-size: 13px; color: var(--muted); }
+.text-size-choices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin: 10px 0; }
+.text-size-choices button { min-height: 44px; padding: 8px 4px; font-size: 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text); }
+.text-size-choices button[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+.reading-preview { color: var(--muted); line-height: 1.65; font-size: 16px; }
+.reading-settings-quiz { margin-bottom: 10px; }
+#app[data-text-size="compact"] #question-text { font-size: clamp(18px, 2vw, 22px); }
+#app[data-text-size="large"] #question-text { font-size: clamp(24px, 2.7vw, 30px); }
+#app[data-text-size="compact"] .option, #app[data-text-size="compact"] .review-answer, #app[data-text-size="compact"] .reading-preview { font-size: 14px; }
+#app[data-text-size="large"] .option, #app[data-text-size="large"] .review-answer, #app[data-text-size="large"] .reading-preview { font-size: 19px; }
+#app[data-text-size="compact"] .review-item > summary { font-size: 13px; }
+#app[data-text-size="large"] .review-item > summary { font-size: 18px; }
+
+.help-page { max-width: 800px; margin: 0 auto; padding-bottom: 32px; }
+.help-contents { display: grid; gap: 10px; margin-bottom: 32px; padding: 20px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
+.help-contents a { font-size: 14px; min-height: 32px; line-height: 1.6; }
+.help-page > section { margin-bottom: 28px; scroll-margin-top: 24px; }
+.help-page h2 { font-size: 22px; line-height: 1.4; margin-bottom: 12px; }
+.help-page section p { line-height: 1.8; color: var(--muted); overflow-wrap: anywhere; }
