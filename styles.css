@@ -592,3 +592,10 @@ summary { cursor: pointer; min-height: 40px; align-content: center; }
  .footer-links a { min-height: 64px; padding: 12px 14px; }
 }
 @media (max-width: 359px) { .brand-name { font-size: 16px; }.brand { gap: 6px; }}
+
+/* Author portrait keeps the message beside the photo at every width. */
+.footer-author { display: grid; grid-template-columns: 80px minmax(0,1fr); align-items: start; gap: 18px; }
+.author-avatar { display: block; width: 80px; height: 80px; object-fit: cover; border-radius: 50%; border: 3px solid var(--surface); box-shadow: 0 0 0 1px var(--border), 0 6px 18px #18253712; }
+.footer-author-copy { min-width: 0; }.footer-author-copy h2 { margin-top: 5px; }
+@media (max-width: 700px) { .footer-author { grid-template-columns: 64px minmax(0,1fr); gap: 14px; }.author-avatar { width: 64px; height: 64px; }.footer-author-copy h2 { font-size: 19px; } }
+@media (max-width: 359px) { .footer-author { grid-template-columns: 56px minmax(0,1fr); gap: 12px; }.author-avatar { width: 56px; height: 56px; }.footer-author-copy h2 { font-size: 18px; } }
