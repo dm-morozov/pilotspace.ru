@@ -227,7 +227,6 @@ summary { cursor: pointer; min-height: 40px; align-content: center; }
     .intro { padding: 0 4px; width: 100%; }
     .intro > .eyebrow { font-size: 10px; }
     .intro h1 { font-size: clamp(28px, 7.8vw, 39px); margin: 14px 0; line-height: 1.16; }
-    .intro h1 br:first-of-type { display: none; }
     .intro-description { font-size: 14px; line-height: 1.7; max-width: 440px; }
     .intro-stats { margin: 20px 0 14px; gap: 32px; }
     .intro-stats strong { font-size: 21px; }
@@ -558,3 +557,38 @@ summary { cursor: pointer; min-height: 40px; align-content: center; }
 .lesson-sources ul { padding-left: 20px; line-height: 1.8; }.lesson-sources li { margin: 10px 0; }
 .lesson-sources > a { display: inline-flex; align-items: center; min-height: 44px; }
 @media (max-width: 560px) { .lesson-grid, .concept-list { grid-template-columns: minmax(0,1fr); } .lesson-tile { padding: 20px; }.catalog-group > summary { padding: 16px; gap: 10px; } .catalog-group .section-grid { padding: 12px; } }
+
+/* Consistent mobile entry and footer navigation. */
+.intro h1 > span { display: block; margin-top: .12em; }
+.intro-links { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin-top: 20px; }
+.intro-links a { justify-content: center; padding: 10px 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); text-decoration: none; text-align: center; line-height: 1.4; }
+.intro-links a:last-child { grid-column: 1 / -1; }
+.intro-links a:hover, .footer-site-links a:hover { border-color: var(--accent); background: var(--accent-soft); }
+.footer-bottom { display: grid; grid-template-columns: minmax(160px,1fr) 2fr; gap: 16px 24px; padding-top: 24px; }
+.footer-identity { display: flex; flex-direction: column; gap: 4px; }
+.footer-identity strong { color: var(--text); font-size: 16px; }.footer-identity span { font-size: 12px; }
+.footer-site-links { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; }
+.footer-site-links a { display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 12px; text-decoration: none; background: var(--surface); line-height: 1.4; text-align: center; }
+.footer-note { grid-column: 1 / -1; margin: 0; font-size: 12px; line-height: 1.7; }
+#app > .app-footer { width: 100%; margin: 36px 0 28px; }
+@media (max-width: 700px) {
+ .app-header { padding-top: 16px; padding-bottom: 16px; margin-bottom: 24px; }
+ .intro { padding: 0; }
+ .intro > .eyebrow { letter-spacing: .1em; font-size: 9px; }
+ .intro h1 { font-size: clamp(28px,7vw,34px); line-height: 1.18; letter-spacing: -.035em; margin: 16px 0; }
+ .intro-description { line-height: 1.7; margin: 0; }
+ .intro-links { margin-top: 18px; }
+ .intro .intro-scope { margin: 12px 0 0; font-size: 11px; }
+ .intro .release-link { margin-top: 12px; gap: 8px; }
+ .intro-stats { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; margin: 16px 0 0; }
+ .intro-stats > div { padding: 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+ .app-footer { width: calc(100% - 32px); margin: 28px auto; }
+ .footer-contact { padding: 24px 0; gap: 20px; }
+ .footer-author p { line-height: 1.65; }
+ .footer-bottom { grid-template-columns: minmax(0,1fr); gap: 18px; padding-top: 24px; }
+ .footer-site-links { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+ .footer-site-links a:last-child { grid-column: 1 / -1; }
+ .footer-links { display: grid; grid-template-columns: minmax(0,1fr); gap: 10px; }
+ .footer-links a { min-height: 64px; padding: 12px 14px; }
+}
+@media (max-width: 359px) { .brand-name { font-size: 16px; }.brand { gap: 6px; }}

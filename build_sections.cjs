@@ -9,6 +9,7 @@ const groups=[...new Set(bank.map(q=>q.section_id))].map((id,i)=>{
 if(groups.length!==slugs.length) throw new Error('Review section URLs before rebuilding');
 const base=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const header=base.match(/<header class="app-header">[\s\S]*?<\/header>/)[0].replace('id="brand-home"','').replaceAll('href="index.html"','href="../index.html"').replaceAll('src="favicon.svg','src="../favicon.svg');
+const footer=base.match(/<div class="footer-bottom">[\s\S]*?<p class="footer-note">[\s\S]*?<\/p><\/div>/)[0].replaceAll('href="','href="../');
 function page(title,description,url,body){return `<!DOCTYPE html>
 <html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${escape(title)} — PilotSpace</title>
 <meta name="description" content="${escape(description)}"><link rel="canonical" href="https://pilotspace.ru/${url}">
@@ -23,8 +24,8 @@ function page(title,description,url,body){return `<!DOCTYPE html>
 <meta name="twitter:image:alt" content="PilotSpace — тренажёр ЧЛЭ для пилотов. Бесплатно, без регистрации, с офлайн-тренировками.">
 <meta property="og:site_name" content="PilotSpace"><meta property="og:locale" content="ru_RU">
 <meta name="twitter:title" content="${escape(title)} — PilotSpace"><meta name="twitter:description" content="${escape(description)}">
-<link rel="icon" href="../favicon.svg" type="image/svg+xml"><link rel="manifest" href="../site.webmanifest"><link rel="apple-touch-icon" href="../icons/icon-180-v2.png"><script src="../theme.js?v=1"></script><link rel="stylesheet" href="../styles.css?v=26"></head>
-<body><div id="app">${header}<main class="section-page">${body}</main><footer class="app-footer"><a href="../index.html">К тренировкам</a> · <a href="../about.html">О тренажёре</a> · <a href="../learn.html">Изучение</a> · <a href="../updates.html">Обновления</a> · <a href="../help.html">Помощь</a><p>Дмитрий Морозов · PilotSpace</p></footer></div></body></html>\n`;}
+<link rel="icon" href="../favicon.svg" type="image/svg+xml"><link rel="manifest" href="../site.webmanifest"><link rel="apple-touch-icon" href="../icons/icon-180-v2.png"><script src="../theme.js?v=1"></script><link rel="stylesheet" href="../styles.css?v=27"></head>
+<body><div id="app">${header}<main class="section-page">${body}</main><footer class="app-footer">${footer}</footer></div></body></html>\n`;}
 const descriptions = {
  '3.1': 'Воздушный кодекс Республики Узбекистан, полномочия авиационной администрации, экипаж и использование воздушного пространства.',
  '3.2': 'Определения и правила выполнения полётов: аэродромы, взлёт и посадка, визуальные полёты, условия и ограничения.',
