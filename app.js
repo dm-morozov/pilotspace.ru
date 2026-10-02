@@ -193,8 +193,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   function favoriteButton() {
     const marked = favorites.has(questions[index]?.uid)
-    $('btn-favorite').textContent = marked ? '★ В избранном' : '☆ В избранное'
+    $('btn-favorite').textContent = marked ? '★' : '☆'
     $('btn-favorite').setAttribute('aria-pressed', String(marked))
+    const label = marked ? 'Убрать вопрос из избранного' : 'Добавить вопрос в избранное'
+    $('btn-favorite').setAttribute('aria-label', label)
+    $('btn-favorite').setAttribute('title', label)
   }
   function refreshProgress() {
     renderHistory()
@@ -332,21 +335,21 @@ document.addEventListener('DOMContentLoaded', () => {
     updateRanges()
   }
 
-  function startQuiz(onlyMistakes = false, onlyFavorites = false) {
-    questions = onlyFavorites ? [...favorites].map(id => byId.get(id)) : onlyMistakes ? [...mistakes].map(id => byId.get(id)) : filteredQuestions()
+  function startQuiz(onlyMistakes = false, onlyFavorites = false, attemptIds = null) {
+    questions = attemptIds ? attemptIds.map(id => byId.get(id)) : onlyFavorites ? [...favorites].map(id => byId.get(id)) : onlyMistakes ? [...mistakes].map(id => byId.get(id)) : filteredQuestions()
     const range = $('range-select').value
-    if (!onlyMistakes && !onlyFavorites && !shortPractice() && range !== 'all') {
+    if (!attemptIds && !onlyMistakes && !onlyFavorites && !shortPractice() && range !== 'all') {
       const [start, end] = range.split('-').map(Number)
       questions = questions.slice(start, end)
     }
     if (!questions.length) return
-    if ((!onlyMistakes && !onlyFavorites && shortPractice()) || $('random-checkbox').checked) {
+    if ((!attemptIds && !onlyMistakes && !onlyFavorites && shortPractice()) || $('random-checkbox').checked) {
       for (let i = questions.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1))
         ;[questions[i], questions[j]] = [questions[j], questions[i]]
       }
     }
-    if (!onlyMistakes && !onlyFavorites && shortPractice()) questions = questions.slice(0, Number(practiceSize))
+    if (!attemptIds && !onlyMistakes && !onlyFavorites && shortPractice()) questions = questions.slice(0, Number(practiceSize))
     index = score = 0
     results = questions.map(() => null)
     $('score').textContent = '0'
@@ -395,6 +398,7 @@ document.addEventListener('DOMContentLoaded', () => {
     answered = false
     selected = new Set()
     $('source-details').open = false
+    $('quiz-reading').open = false
     $('current-question-num').textContent =
       `Вопрос ${index + 1} из ${questions.length}`
     $('progress-bar-fill').style.width = `${(index / questions.length) * 100}%`
@@ -583,6 +587,10 @@ document.addEventListener('DOMContentLoaded', () => {
           : 'Отличный результат!'
     switchScreen('result')
     renderSessionReview()
+    const attemptErrors = results.filter(result => result === false).length
+    $('btn-attempt-mistakes').hidden = attemptErrors === 0
+    $('btn-attempt-mistakes').textContent = `Повторить ошибки этой попытки · ${attemptErrors}`
+    $('attempt-replace-notice').hidden = !saved || (attemptErrors === 0 && mistakes.size === 0)
     $('btn-result-mistakes').hidden = mistakes.size === 0
     $('result-mistakes-count').textContent = mistakes.size ? `В списке на повторение: ${mistakes.size}. Правильный ответ при следующей попытке уберёт вопрос из списка.` : 'Все ошибки отработаны. Можно переходить к новой тренировке.'
   }
@@ -606,6 +614,10 @@ document.addEventListener('DOMContentLoaded', () => {
   $('btn-start').addEventListener('click', () => startQuiz())
   $('btn-resume').addEventListener('click', resumeQuiz)
   $('btn-mistakes').addEventListener('click', () => startQuiz(true))
+  $('btn-attempt-mistakes').addEventListener('click', () => {
+    const ids = questions.filter((q, i) => results[i] === false).map(q => q.uid)
+    if (ids.length) startQuiz(false, false, ids)
+  })
   $('btn-result-mistakes').addEventListener('click', () => startQuiz(true))
   $('btn-check').addEventListener('click', checkAnswer)
   $('btn-next').addEventListener('click', nextQuestion)

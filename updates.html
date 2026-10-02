@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon" href="icons/icon-180-v2.png">
     <link rel="manifest" href="site.webmanifest">
     <script src="theme.js?v=1"></script>
-    <link rel="stylesheet" href="styles.css?v=23">
+    <link rel="stylesheet" href="styles.css?v=24">
 </head>
 <body class="updates-page">
     <div id="app">
@@ -53,8 +53,8 @@
                 <aside class="updates-aside" aria-label="Планы и поддержка">
                     <section class="updates-note">
                         <span class="eyebrow">Следующий шаг</span>
-                        <h2>Видимость в поиске</h2>
-                        <p>Дальше хочу подключить инструменты Google и Яндекса, проверить индексацию страниц и понять, по каким запросам люди находят тренажёр.</p>
+                        <h2>Прогресс по темам</h2>
+                        <p>Дальше хочу показывать, какие темы уже получаются уверенно, а к каким стоит вернуться. Статистика будет сохраняться в браузере и работать без сервера.</p>
                         <div class="updates-later"><h3>На горизонте</h3><p>Личный кабинет, синхронизация между устройствами и доска идей с голосованием.</p></div>
                         <p class="updates-fine-print">Это планы, а не готовые функции. Порядок может меняться: сначала исправляю ошибки и улучшаю подготовку.</p>
                     </section>
@@ -71,6 +71,13 @@
                 <section aria-labelledby="timeline-title">
                     <h2 class="updates-section-title" id="timeline-title">История обновлений</h2>
                     <ol class="release-timeline">
+                        <li class="release-entry" id="v1-5-0">
+                            <div class="release-meta"><time datetime="2026-10-02">2 октября 2026</time><span class="release-badge">Версия 1.5.0</span></div>
+                            <h3>Больше места для самого вопроса</h3>
+                            <p>Заменил надпись избранного компактной звёздочкой рядом с разделом. Размер текста перенёс под ответы, рядом с источником и обратной связью: теперь настройки не отодвигают вопрос вниз.</p>
+                            <p>Добавил повторение ошибок конкретной попытки из её разбора, в том числе из истории. Общий список накопленных ошибок по-прежнему доступен отдельно.</p>
+                            <p>Подключил сайт к Google Search Console и Яндекс Вебмастеру. Google обработал карту сайта и обнаружил 26 страниц, Яндекс принял её в очередь. Появление страниц в поиске проверю после индексации.</p>
+                        </li>
                         <li class="release-entry" id="v1-4-0">
                             <div class="release-meta"><time datetime="2026-10-01">1 октября 2026</time><span class="release-badge">Версия 1.4.0</span></div>
                             <h3>История тренировок и своя подборка</h3>

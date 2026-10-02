@@ -390,3 +390,12 @@ test('reading size syncs both controls and survives reload without changing trai
 test('blocked preference storage still changes text without interrupting training',()=>{
  const q=database[0], ui=boot([q],{get(){throw Error('blocked')},set(){throw Error('blocked')}}); ui['btn-start'].click(); ui['text-quiz-large'].click(); assert.equal(ui.app.dataset.textSize,'large'); assert.match(ui['text-size-status'].textContent,/не разрешил/);choose(ui,q.correct_answers[0]);ui['btn-next'].click();assert.equal(Number(ui['final-score-value'].textContent),1);
 });
+
+test('archived attempt errors repeat even after global mistakes were cleared', () => {
+ const q=database[0], other=database[1], storage=new Map(), ui=boot([q,other],storage);
+ ui['btn-start'].click(); choose(ui,Object.keys(q.options).find(letter=>!q.correct_answers.includes(letter))); ui['btn-next'].click(); choose(ui,other.correct_answers[0]);ui['btn-next'].click();
+ assert.equal(ui['btn-attempt-mistakes'].hidden,false); ui['btn-attempt-mistakes'].click(); assert.equal(ui['question-text'].textContent,q.id+'. '+q.question); choose(ui,q.correct_answers[0]);ui['btn-next'].click();
+ assert.equal(ui['btn-attempt-mistakes'].hidden,true); assert.equal(ui['btn-result-mistakes'].hidden,true);
+ ui['btn-restart'].click(); ui['history-list'].children[1].children[0].click(); assert.equal(ui['btn-attempt-mistakes'].hidden,false); assert.equal(ui['btn-result-mistakes'].hidden,true);
+ ui['btn-attempt-mistakes'].click(); assert.equal(JSON.parse(storage.get('chle-progress-v1')).saved.ids.length,1); assert.equal(ui['question-text'].textContent,q.id+'. '+q.question); assert.equal(JSON.parse(storage.get('chle-progress-v1')).history.length,2);
+});

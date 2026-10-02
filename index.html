@@ -54,7 +54,7 @@
     }
     </script>
     <script src="theme.js?v=1"></script>
-    <link rel="stylesheet" href="styles.css?v=23">
+    <link rel="stylesheet" href="styles.css?v=24">
 </head>
 <body>
     <div id="app">
@@ -85,7 +85,7 @@
                 <h1>К следующему <br>полёту&nbsp;—<br><span>с уверенностью.</span></h1>
                 <p class="intro-description">PilotSpace — тренажёр ЧЛЭ для подготовки к проверке знаний. Выберите тему, пройдите короткую тренировку и повторите ошибки.</p>
                 <a class="release-link" href="sections/index.html">Все разделы подготовки →</a>
-                <a class="release-link" href="updates.html#v1-4-0"><span>Что нового</span> Версия 1.4.0 <span aria-hidden="true">↗</span></a>
+                <a class="release-link" href="updates.html#v1-5-0"><span>Что нового</span> Версия 1.5.0 <span aria-hidden="true">↗</span></a>
                 <div class="intro-stats">
                     <div><strong id="total-questions">—</strong><span>вопросов для практики</span></div>
                     <div><strong>Без оплаты</strong><span>и регистрации</span></div>
@@ -230,12 +230,7 @@
             </div>
             
             <div class="question-container">
-                <div class="question-heading"><div id="question-section" class="section-tag">Раздел</div><button id="btn-favorite" class="text-button favorite-toggle" type="button" aria-pressed="false">☆ В избранное</button></div>
-                <details class="reading-settings reading-settings-quiz"><summary>Размер текста</summary><div class="text-size-choices" role="group" aria-label="Размер текста вопросов">
-<button id="text-quiz-compact" type="button" aria-pressed="false">Компактный</button>
-<button id="text-quiz-normal" type="button" aria-pressed="true">Обычный</button>
-<button id="text-quiz-large" type="button" aria-pressed="false">Крупный</button>
-</div></details>
+                <div class="question-heading"><div id="question-section" class="section-tag">Раздел</div><button id="btn-favorite" class="text-button favorite-toggle" type="button" aria-pressed="false" aria-label="Добавить вопрос в избранное" title="Добавить вопрос в избранное">☆</button></div>
                 <h2 id="question-text" tabindex="-1">Текст вопроса</h2>
                 <div id="question-images"></div>
                 <p id="answer-help"></p>
@@ -243,8 +238,14 @@
                     <!-- Options will be injected here -->
                 </div>
                 <p id="answer-feedback" role="status" aria-live="polite"></p>
+                <div class="question-tools">
+                <details id="quiz-reading" class="reading-settings reading-settings-quiz"><summary>Размер текста</summary><div class="text-size-choices" role="group" aria-label="Размер текста вопросов">
+<button id="text-quiz-compact" type="button" aria-pressed="false">Компактный</button>
+<button id="text-quiz-normal" type="button" aria-pressed="true">Обычный</button>
+<button id="text-quiz-large" type="button" aria-pressed="false">Крупный</button>
+</div></details>
                 <details id="source-details" class="source-details">
-                    <summary>Источник и обратная связь</summary>
+                    <summary>Источник и связь</summary>
                     <div class="source-content">
                         <div id="question-source" class="source-links"></div>
                         <p id="question-note" class="source-note"></p>
@@ -252,6 +253,7 @@
                         <p class="report-hint">В письме уже будет номер вопроса — добавьте описание ошибки.</p>
                     </div>
                 </details>
+                </div>
             </div>
             
             <div class="quiz-footer">
@@ -273,7 +275,9 @@
                 <p id="result-message" class="result-message">Отличный результат!</p>
                 <div class="action-buttons">
                     <p id="result-mistakes-count" class="settings-footnote"></p>
-                    <button id="btn-result-mistakes" class="btn secondary" type="button" hidden>Повторить ошибки</button>
+                    <button id="btn-attempt-mistakes" class="btn secondary" type="button" hidden>Повторить ошибки этой попытки</button>
+                    <p id="attempt-replace-notice" class="settings-footnote" hidden>Новая тренировка заменит незавершённую попытку.</p>
+                    <button id="btn-result-mistakes" class="btn secondary" type="button" hidden>Все накопленные ошибки</button>
                     <button id="btn-restart" class="btn primary">Начать заново</button>
                 </div>
             </div>
@@ -340,9 +344,9 @@
                 <a href="https://t.me/dem2014" target="_blank" rel="noopener noreferrer"><span>Telegram ↗</span>@dem2014</a>
             </div>
         </div>
-        <div class="footer-bottom"><span>PilotSpace · Учиться с комфортом</span><a href="help.html">Помощь</a><a href="updates.html">История обновлений · 1.4.0</a><span>Бесплатно. Для тех, кто в небе.</span></div>
+        <div class="footer-bottom"><span>PilotSpace · Учиться с комфортом</span><a href="help.html">Помощь</a><a href="updates.html">История обновлений · 1.5.0</a><span>Бесплатно. Для тех, кто в небе.</span></div>
     </footer>
-    <script src="app.js?v=14"></script>
+    <script src="app.js?v=15"></script>
     <script src="support.js?v=2"></script>
     <script src="install.js?v=1"></script>
     <script src="offline.js?v=2"></script>
