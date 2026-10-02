@@ -55,6 +55,7 @@
     </script>
     <script src="theme.js?v=1"></script>
     <link rel="stylesheet" href="styles.css?v=28">
+    <script src="analytics.js?v=1" defer></script>
 </head>
 <body>
     <div id="app">
@@ -86,7 +87,7 @@
                 <p class="intro-description">Бесплатный тренажёр для подготовки членов лётных экипажей (ЧЛЭ) к проверке теоретических знаний: системы Airbus A330, A319/320/321 и Boeing 757/767, аэродинамика, навигация, метеорология и правила полётов.</p>
                 <nav class="intro-links" aria-label="Знакомство с тренажёром"><a href="about.html">О тренажёре</a><a href="learn.html">Изучение по темам</a><a href="sections/index.html">Разделы подготовки →</a></nav>
                 <p class="intro-scope">База ЧЛЭ MY FREIGHTER; правовой раздел включает нормы Узбекистана.</p>
-                <a class="release-link" href="updates.html#v1-7-2"><span>Что нового</span> Версия 1.7.2 <span aria-hidden="true">↗</span></a>
+                <a class="release-link" href="updates.html#v1-7-3"><span>Что нового</span> Версия 1.7.3 <span aria-hidden="true">↗</span></a>
                 <div class="intro-stats">
                     <div><strong id="total-questions">—</strong><span>вопросов для практики</span></div>
                     <div><strong>Без оплаты</strong><span>и регистрации</span></div>
@@ -128,7 +129,7 @@
                 <div class="form-group">
                     <div class="topic-search">
                         <label for="topic-search">Найти раздел</label>
-                        <div class="topic-search-field"><input id="topic-search" type="search" placeholder="Например, A320 или метеорология" autocomplete="off" aria-describedby="topic-search-status"><button id="topic-search-clear" class="text-button" type="button" hidden>Очистить</button></div>
+                        <div class="topic-search-field"><input id="topic-search" class="ym-disable-keys" type="search" placeholder="Например, A320 или метеорология" autocomplete="off" aria-describedby="topic-search-status"><button id="topic-search-clear" class="text-button" type="button" hidden>Очистить</button></div>
                         <p id="topic-search-status" class="selection-caption" role="status" aria-live="polite"></p>
                         <ul id="topic-search-results" hidden></ul>
                     </div>
@@ -314,14 +315,14 @@
             <div class="support-payment">
                 <div class="support-requisites">
                     <label for="support-card-number">Перевод на карту · любая сумма</label>
-                    <input id="support-card-number" type="text" value="2200 3961 1392 6436" readonly spellcheck="false" aria-describedby="support-copy-status">
+                    <input id="support-card-number" class="ym-disable-keys" type="text" value="2200 3961 1392 6436" readonly spellcheck="false" aria-describedby="support-copy-status">
                 </div>
                 <button id="btn-copy-card" class="btn secondary" type="button" data-copy-target="support-card-number" data-copy-value="2200396113926436" data-copy-success="Номер карты скопирован. Спасибо за поддержку!">Скопировать карту</button>
             </div>
             <div class="support-payment">
                 <div class="support-requisites">
                     <label for="support-phone-number">Перевод по номеру телефона · СБП</label>
-                    <input id="support-phone-number" type="text" value="+7 903 392-22-29" readonly spellcheck="false" aria-describedby="support-recipient support-copy-status">
+                    <input id="support-phone-number" class="ym-disable-keys" type="text" value="+7 903 392-22-29" readonly spellcheck="false" aria-describedby="support-recipient support-copy-status">
                     <span id="support-recipient" class="support-recipient">Морозов Дмитрий Павлович · Т-Банк, СберБанк или Альфа-Банк</span>
                 </div>
                 <button id="btn-copy-phone" class="btn secondary" type="button" data-copy-target="support-phone-number" data-copy-value="79033922229" data-copy-success="Номер телефона скопирован. Выберите удобный банк при переводе.">Скопировать телефон</button>
@@ -348,11 +349,11 @@
                 <a href="https://t.me/dem2014" target="_blank" rel="noopener noreferrer"><span>Telegram ↗</span>@dem2014</a>
             </div>
         </div>
-        <div class="footer-bottom"><div class="footer-identity"><strong>PilotSpace</strong><span>Учиться с комфортом</span></div><nav class="footer-site-links" aria-label="Навигация внизу страницы"><a href="index.html">К тренировкам</a><a href="about.html">О тренажёре</a><a href="learn.html">Изучение</a><a href="help.html">Помощь</a><a href="updates.html">Обновления · 1.7.2</a></nav><p class="footer-note">Бесплатно. Для тех, кто в небе.</p></div>
+        <div class="footer-bottom"><div class="footer-identity"><strong>PilotSpace</strong><span>Учиться с комфортом</span></div><nav class="footer-site-links" aria-label="Навигация внизу страницы"><a href="index.html">К тренировкам</a><a href="about.html">О тренажёре</a><a href="learn.html">Изучение</a><a href="help.html">Помощь</a><a href="updates.html">Обновления · 1.7.3</a></nav><p class="footer-note">Бесплатно. Для тех, кто в небе.</p></div>
     </footer>
-    <script src="app.js?v=15"></script>
+    <script src="app.js?v=16"></script>
     <script src="support.js?v=2"></script>
     <script src="install.js?v=1"></script>
-    <script src="offline.js?v=2"></script>
+    <script src="offline.js?v=3"></script>
 </body>
 </html>

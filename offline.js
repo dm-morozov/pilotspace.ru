@@ -125,6 +125,7 @@
         const estimate = await navigator.storage?.estimate?.().catch(() => null);
         if (estimate?.quota && estimate.quota - estimate.usage < info.bytes * 1.2) throw new Error('space');
         observe(await navigator.serviceWorker.register('sw.js', {scope:'./', updateViaCache:'none'}));
+        globalThis.pilotspaceAnalytics?.('offline_download_start');
       } else if (mode === 'repair') {
         await registration.update();
         if (!registration.installing && !registration.waiting) await ask(registration.active, 'REPAIR');

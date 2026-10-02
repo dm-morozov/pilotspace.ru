@@ -356,6 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
     switchScreen('quiz')
     loadQuestion()
     saveSession()
+    globalThis.pilotspaceAnalytics?.('training_start')
   }
 
   function resumeQuiz() {
@@ -571,6 +572,7 @@ document.addEventListener('DOMContentLoaded', () => {
     history = history.slice(0, historyLimit)
     saved = null
     persist()
+    globalThis.pilotspaceAnalytics?.('training_complete')
     showResult()
   }
 
