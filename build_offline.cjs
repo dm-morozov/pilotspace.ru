@@ -7,7 +7,7 @@ const digest = data => crypto.createHash('sha256').update(data).digest('hex');
 const bank = JSON.parse(fs.readFileSync(path.join(root, 'questions.json'), 'utf8'));
 const files = new Set(['index.html', 'updates.html', 'styles.css', 'app.js', 'offline.js',
   'theme.js', 'support.js', 'questions.js', 'favicon.svg', 'site.webmanifest',
-  'SOURCE_REVIEW.md', 'QUESTION_REVIEW.md']);
+  'SOURCE_REVIEW.md', 'QUESTION_REVIEW.md', 'about.html', 'learn.html']);
 for (const q of bank) for (const image of q.images || []) files.add(image.src);
 for (const icon of JSON.parse(fs.readFileSync(path.join(root, 'site.webmanifest'), 'utf8')).icons) files.add(icon.src);
 files.add('icons/icon-180-v2.png');
