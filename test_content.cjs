@@ -17,3 +17,12 @@ test('lesson self-checks use bank keys and sources; reading pages do not run qui
  const lessons=require('./learning_content.cjs');for(const lesson of lessons){const html=fs.readFileSync('lessons/'+lesson.slug+'.html','utf8');assert.equal([...html.matchAll(/data-question=/g)].length,3);assert(!/src="[^"]*app\.js/.test(html));for(const uid of lesson.checks){const q=bank.find(q=>q.uid===uid);assert(q);const card=html.match(new RegExp('data-question="'+uid+'">([\\s\\S]*?)</details>'))[1];for(const letter of q.correct_answers)assert(card.includes('<strong>'+letter+'.</strong> '+escape(q.options[letter])));}for(const source of lesson.sources)assert(html.includes(escape(source.url)));}
  const hub=fs.readFileSync('learn.html','utf8');assert.equal([...hub.matchAll(/class="catalog-group"/g)].length,4);assert.equal([...hub.matchAll(/class="section-tile"/g)].length,22);assert.equal([...hub.matchAll(/class="lesson-tile"/g)].length,3);
 });
+
+ test('all self-check explanations and related lessons are available as static HTML',()=>{
+ for(const lesson of require('./learning_content.cjs')){
+ const html=fs.readFileSync('lessons/'+lesson.slug+'.html','utf8');
+ for(const uid of lesson.checks)assert(html.includes(escape(lesson.explanations[uid])),uid);
+ for(const [question,answer] of lesson.faq){assert(html.includes(escape(question)));assert(html.includes(escape(answer)));}
+ for(const slug of lesson.related)assert(html.includes('href="'+slug+'.html"'));
+ }assert(!fs.readFileSync('sitemap.xml','utf8').includes('lesson-guides.js'));
+ });

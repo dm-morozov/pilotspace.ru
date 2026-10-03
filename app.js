@@ -548,6 +548,19 @@ document.addEventListener('DOMContentLoaded', () => {
         answer.textContent = `${letter}. ${q.options[letter]}`
         body.append(answer)
       }
+      const guide = globalThis.pilotspaceLessonGuides?.[q.uid]
+      if (guide) {
+        const explanation = document.createElement('p')
+        explanation.className = 'lesson-explanation'
+        explanation.textContent = 'Почему так: ' + guide.text
+        const link = document.createElement('a')
+        link.className = 'review-lesson-link'
+        link.href = guide.url
+        link.target = '_blank'
+        link.rel = 'noopener'
+        link.textContent = 'Разобраться: ' + guide.title + ' ↗'
+        body.append(explanation, link)
+      }
       if (q.source_note) {
         const note = document.createElement('p')
         note.className = 'source-note'

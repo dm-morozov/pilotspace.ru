@@ -599,3 +599,7 @@ summary { cursor: pointer; min-height: 40px; align-content: center; }
 .footer-author-copy { min-width: 0; }.footer-author-copy h2 { margin-top: 5px; }
 @media (max-width: 700px) { .footer-author { grid-template-columns: 64px minmax(0,1fr); gap: 14px; }.author-avatar { width: 64px; height: 64px; }.footer-author-copy h2 { font-size: 19px; } }
 @media (max-width: 359px) { .footer-author { grid-template-columns: 56px minmax(0,1fr); gap: 12px; }.author-avatar { width: 56px; height: 56px; }.footer-author-copy h2 { font-size: 18px; } }
+
+.lesson-explanation { padding: 12px 14px; border-left: 3px solid var(--accent); background: var(--surface-soft); border-radius: 0 10px 10px 0; line-height: 1.65; overflow-wrap: anywhere; }
+.review-lesson-link { display: inline-flex; align-items: center; min-height: 44px; margin: 0 0 12px; overflow-wrap: anywhere; }
+.lesson-faq { margin-bottom: 12px; }

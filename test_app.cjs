@@ -31,6 +31,7 @@ function boot(data = database, storage = new Map(), size = 'custom', search = ''
         Option: class extends Element { constructor(text, value) { super('option'); this.textContent=text; this.value=value; } },
         document: {getElementById: id => elements[id], createElement: tag => new Element(tag),
             createTextNode: text => ({textContent:text}), addEventListener: (_, fn) => fn()}};
+    vm.runInNewContext(fs.readFileSync(__dirname+'/lesson-guides.js', 'utf8'), context);
     vm.runInNewContext(fs.readFileSync(__dirname+'/app.js', 'utf8'), context);
     // Existing scoring tests use the full, ordered range explicitly.
     if (size !== '20') elements[`size-${size}`].click();
@@ -399,3 +400,13 @@ test('archived attempt errors repeat even after global mistakes were cleared', (
  ui['btn-restart'].click(); ui['history-list'].children[1].children[0].click(); assert.equal(ui['btn-attempt-mistakes'].hidden,false); assert.equal(ui['btn-result-mistakes'].hidden,true);
  ui['btn-attempt-mistakes'].click(); assert.equal(JSON.parse(storage.get('chle-progress-v1')).saved.ids.length,1); assert.equal(ui['question-text'].textContent,q.id+'. '+q.question); assert.equal(JSON.parse(storage.get('chle-progress-v1')).history.length,2);
 });
+
+ test('review links only covered questions to their specific lesson and preserves results',()=>{
+ const covered=database.find(q=>q.uid==='3.7:12'),other=database[0],ui=boot([covered,other]);ui['btn-start'].click();
+ ui['options-container'].children.find(b=>b.dataset.letter!==covered.correct_answers[0]).click();ui['btn-next'].click();
+ ui['options-container'].children.find(b=>b.dataset.letter!==other.correct_answers[0]).click();ui['btn-next'].click();
+ const first=ui['review-list'].children[0].children[1],second=ui['review-list'].children[1].children[1];
+ assert(first.children.some(el=>el.className==='lesson-explanation'));
+ const link=first.children.find(el=>el.className==='review-lesson-link');assert.equal(link.href,'lessons/metar.html#self-check');assert.equal(link.target,'_blank');
+ assert(!second.children.some(el=>el.className==='review-lesson-link'));assert.equal(ui['final-score-value'].textContent,0);
+ });
