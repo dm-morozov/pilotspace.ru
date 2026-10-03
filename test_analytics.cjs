@@ -34,6 +34,6 @@ test('lesson events and allowed goals contain no answer or progress parameters',
 });
 test('every sitemap page includes the shared analytics script once',()=>{
  const urls=[...fs.readFileSync(__dirname+'/sitemap.xml','utf8').matchAll(/<loc>https:\/\/pilotspace.ru\/(.*?)<\/loc>/g)];
- assert.equal(urls.length,53);
+ assert.equal(urls.length,54);
  for(const [,path] of urls){const html=fs.readFileSync(__dirname+'/'+(path||'index.html'),'utf8');assert.equal([...html.matchAll(/src="(?:\.\.\/)?analytics\.js\?v=1"/g)].length,1,path);}
 });
