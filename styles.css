@@ -603,3 +603,15 @@ summary { cursor: pointer; min-height: 40px; align-content: center; }
 .lesson-explanation { padding: 12px 14px; border-left: 3px solid var(--accent); background: var(--surface-soft); border-radius: 0 10px 10px 0; line-height: 1.65; overflow-wrap: anywhere; }
 .review-lesson-link { display: inline-flex; align-items: center; min-height: 44px; margin: 0 0 12px; overflow-wrap: anywhere; }
 .lesson-faq { margin-bottom: 12px; }
+
+/* Keep the training entry visible before supporting content. */
+.intro-training-link { margin-top: 18px; max-width: 370px; text-decoration: none; }
+#training-settings { scroll-margin-top: 16px; }
+#training-settings:focus { outline: none; }
+.mistake-panel { margin-top: 24px; padding: 12px 0; }
+.mistake-panel > summary { min-height: 44px; font-size: 14px; font-weight: 600; color: var(--text); }
+.source-links a { display: inline-flex; align-items: center; min-height: 44px; }
+:where(a, button, input, select, summary):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (hover: none) and (prefers-reduced-motion: no-preference) {
+ .btn:active:not(:disabled), .option:active:not(:disabled) { transform: translateY(1px); }
+}

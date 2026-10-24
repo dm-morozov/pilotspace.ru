@@ -54,7 +54,7 @@
     }
     </script>
     <script src="theme.js?v=1"></script>
-    <link rel="stylesheet" href="styles.css?v=29">
+    <link rel="stylesheet" href="styles.css?v=30">
     <script src="analytics.js?v=1" defer></script>
 </head>
 <body>
@@ -85,9 +85,10 @@
                 <span class="eyebrow"><span class="status-dot"></span> В своём темпе. В любом месте.</span>
                 <h1>Тесты для пилотов.<span>Подготовка по темам.</span></h1>
                 <p class="intro-description">Бесплатный тренажёр для подготовки членов лётных экипажей (ЧЛЭ) к проверке теоретических знаний: системы Airbus A330, A319/320/321 и Boeing 757/767, аэродинамика, навигация, метеорология и правила полётов.</p>
+                <a class="btn primary intro-training-link" href="#training-settings">Выбрать тренировку</a>
                 <nav class="intro-links" aria-label="Знакомство с тренажёром"><a href="about.html">О тренажёре</a><a href="learn.html">Изучение по темам</a><a href="sections/index.html">Разделы подготовки →</a></nav>
                 <p class="intro-scope">База ЧЛЭ MY FREIGHTER; правовой раздел включает нормы Узбекистана.</p>
-                <a class="release-link" href="updates.html#v1-7-6"><span>Что нового</span> Версия 1.7.6 <span aria-hidden="true">↗</span></a>
+                <a class="release-link" href="updates.html#v1-8-0"><span>Что нового</span> Версия 1.8.0 <span aria-hidden="true">↗</span></a>
                 <div class="intro-stats">
                     <div><strong id="total-questions">—</strong><span>вопросов для практики</span></div>
                     <div><strong>Без оплаты</strong><span>и регистрации</span></div>
@@ -98,33 +99,12 @@
                 </div>
             </div>
             
-            <div class="settings">
+            <div class="settings" id="training-settings" tabindex="-1">
                 <section id="resume-panel" class="progress-panel" aria-labelledby="resume-title" hidden>
                     <h2 id="resume-title">Продолжим с того же места?</h2>
                     <p id="resume-description"></p>
                     <button id="btn-resume" class="btn primary" type="button">Продолжить тренировку</button>
                 </section>
-                <section class="progress-panel" aria-labelledby="mistakes-title">
-                    <h2 id="mistakes-title">Работа над ошибками <span id="mistake-count" class="count-chip">0</span></h2>
-                    <p>Здесь остаются вопросы, на которые вы ответили неверно. Правильный ответ при повторении уберёт вопрос из списка.</p>
-                    <p id="mistake-empty">Пока ошибок нет.</p>
-                    <details class="mistake-details"><summary>Посмотреть список вопросов</summary><ul id="mistake-list"></ul></details>
-                    <button id="btn-mistakes" class="btn secondary" type="button" disabled>Повторить ошибки</button>
-                </section>
-                <details class="favorites-panel">
-                    <summary>Избранные вопросы <span id="favorite-count">0</span></summary>
-                    <p>Отмечайте вопросы звёздочкой во время тренировки. Здесь — ваша подборка для повторения, независимо от выбранного раздела.</p>
-                    <p id="favorite-empty">В избранном пока пусто.</p>
-                    <ul id="favorite-list"></ul>
-                    <button id="btn-favorites" class="btn secondary" type="button" disabled>Тренироваться по избранному</button>
-                    <p>Запуск подборки заменит незавершённую тренировку. При необходимости сохраните прогресс в файл.</p>
-                </details>
-                <details class="history-panel">
-                    <summary>История тренировок <span id="history-count">0</span></summary>
-                    <p>Последние 20 завершённых попыток в этом браузере. Откройте результат, чтобы разобрать ошибки. Новые результаты появятся после завершения тренировки.</p>
-                    <p id="history-empty">Пока нет завершённых тренировок.</p>
-                    <ol id="history-list"></ol>
-                </details>
                 <div class="settings-heading"><span class="eyebrow">Новая тренировка</span><h2>Что повторим сегодня?</h2><p>Выберите тему и удобный объём вопросов.</p></div>
                 <div class="form-group">
                     <div class="topic-search">
@@ -174,6 +154,27 @@
                 <p id="replace-notice" class="settings-footnote" hidden>Начало новой тренировки или повторения ошибок заменит незавершённую тренировку. Список ошибок сохранится.</p>
                 <p class="settings-footnote">Без таймера. Можно спокойно обдумать ответ.</p>
                 <p class="settings-footnote">Прогресс сохраняется автоматически в этом браузере. При очистке данных сайта он удалится. Перенести его на другое устройство можно через файл.</p>
+                <details class="progress-panel mistake-panel">
+                    <summary id="mistakes-title">Работа над ошибками <span id="mistake-count" class="count-chip">0</span></summary>
+                    <p>Здесь остаются вопросы, на которые вы ответили неверно. Правильный ответ при повторении уберёт вопрос из списка.</p>
+                    <p id="mistake-empty">Пока ошибок нет.</p>
+                    <details class="mistake-details"><summary>Посмотреть список вопросов</summary><ul id="mistake-list"></ul></details>
+                    <button id="btn-mistakes" class="btn secondary" type="button" disabled>Повторить ошибки</button>
+                </details>
+                <details class="favorites-panel">
+                    <summary>Избранные вопросы <span id="favorite-count">0</span></summary>
+                    <p>Отмечайте вопросы звёздочкой во время тренировки. Здесь — ваша подборка для повторения, независимо от выбранного раздела.</p>
+                    <p id="favorite-empty">В избранном пока пусто.</p>
+                    <ul id="favorite-list"></ul>
+                    <button id="btn-favorites" class="btn secondary" type="button" disabled>Тренироваться по избранному</button>
+                    <p>Запуск подборки заменит незавершённую тренировку. При необходимости сохраните прогресс в файл.</p>
+                </details>
+                <details class="history-panel">
+                    <summary>История тренировок <span id="history-count">0</span></summary>
+                    <p>Последние 20 завершённых попыток в этом браузере. Откройте результат, чтобы разобрать ошибки. Новые результаты появятся после завершения тренировки.</p>
+                    <p id="history-empty">Пока нет завершённых тренировок.</p>
+                    <ol id="history-list"></ol>
+                </details>
                 <details class="progress-transfer">
                     <summary>Сохранить или перенести прогресс</summary>
                     <p>Скачайте файл и откройте его здесь на другом устройстве. Он содержит незавершённую тренировку и список ошибок.</p>
@@ -349,7 +350,7 @@
                 <a href="https://t.me/dem2014" target="_blank" rel="noopener noreferrer"><span>Telegram ↗</span>@dem2014</a>
             </div>
         </div>
-        <div class="footer-bottom"><div class="footer-identity"><strong>PilotSpace</strong><span>Учиться с комфортом</span></div><nav class="footer-site-links" aria-label="Навигация внизу страницы"><a href="index.html">К тренировкам</a><a href="about.html">О тренажёре</a><a href="learn.html">Изучение</a><a href="help.html">Помощь</a><a href="updates.html">Обновления · 1.7.6</a></nav><p class="footer-note">Бесплатно. Для тех, кто в небе.</p></div>
+        <div class="footer-bottom"><div class="footer-identity"><strong>PilotSpace</strong><span>Учиться с комфортом</span></div><nav class="footer-site-links" aria-label="Навигация внизу страницы"><a href="index.html">К тренировкам</a><a href="about.html">О тренажёре</a><a href="learn.html">Изучение</a><a href="help.html">Помощь</a><a href="updates.html">Обновления · 1.8.0</a></nav><p class="footer-note">Бесплатно. Для тех, кто в небе.</p></div>
     </footer>
     <script src="lesson-guides.js?v=2"></script>
     <script src="app.js?v=17"></script>
